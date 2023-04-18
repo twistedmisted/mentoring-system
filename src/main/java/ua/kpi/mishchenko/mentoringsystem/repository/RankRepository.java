@@ -7,9 +7,12 @@ import ua.kpi.mishchenko.mentoringsystem.domain.entity.RankEntity;
 import ua.kpi.mishchenko.mentoringsystem.repository.projection.RankNameOnly;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RankRepository extends CrudRepository<RankEntity, Long> {
+
+    Optional<RankEntity> findByName(String name);
 
     @Query(value = "SELECT r.name as name FROM RankEntity r ORDER BY r.id")
     List<RankNameOnly> findProjections();

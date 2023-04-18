@@ -10,3 +10,7 @@ spring:
     username: tw_admin
     password: rjUDALCZjEvYDU3sDPloMP3IESd0qSIp
     driver-class-name: org.postgresql.Driver
+
+s3:
+  access-key: AKIAVDELATUHYAGXDV4J
+  secret-key: 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

@@ -6,4 +6,5 @@ import ua.kpi.mishchenko.mentoringsystem.domain.entity.UserEntity;
 
 @Repository
 public interface UserRepository extends CrudRepository<UserEntity, Long> {
+    boolean existsByEmail(String email);
 }
