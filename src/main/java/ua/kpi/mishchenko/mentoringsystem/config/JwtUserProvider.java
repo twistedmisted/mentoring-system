@@ -5,16 +5,12 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import ua.kpi.mishchenko.mentoringsystem.domain.entity.RoleEntity;
 import ua.kpi.mishchenko.mentoringsystem.domain.entity.UserEntity;
 import ua.kpi.mishchenko.mentoringsystem.repository.UserRepository;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
 
 public class JwtUserProvider implements AuthenticationProvider {
 
@@ -34,15 +30,7 @@ public class JwtUserProvider implements AuthenticationProvider {
         if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
             throw new BadCredentialsException("External system authentication failed");
         }
-        return new UsernamePasswordAuthenticationToken(email, user.getPassword(), getAuthorities(user.getRoles()));
-    }
-
-    private Collection<? extends GrantedAuthority> getAuthorities(List<RoleEntity> roles) {
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        for (RoleEntity role : roles) {
-            authorities.add(new SimpleGrantedAuthority(role.getName()));
-        }
-        return authorities;
+        return new UsernamePasswordAuthenticationToken(email, user.getPassword(), Collections.singleton(new SimpleGrantedAuthority(user.getRole().getName())));
     }
 
     @Override

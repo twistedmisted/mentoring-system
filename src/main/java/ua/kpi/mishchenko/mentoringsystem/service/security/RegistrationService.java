@@ -47,7 +47,7 @@ public class RegistrationService {
         entity.setSurname(userToSave.getSurname());
         entity.setEmail(userToSave.getEmail());
         entity.setPassword(passwordEncoder.encode(userToSave.getPassword()));
-        entity.addRole(roleRepository.findByName(userToSave.getRole())
+        entity.setRole(roleRepository.findByName(userToSave.getRole())
                 .orElseThrow(() -> new ResponseStatusException(INTERNAL_SERVER_ERROR, "Схоже, що ми маємо деякі проблеми під час реєстрації. Зачекайте, можливо ми вже вирішуємо це.")));
         entity.setStatus(NEEDS_INFORMATION);
         return entity;

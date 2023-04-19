@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -67,6 +68,12 @@ public class JwtSecurityConfig {
     public AuthenticationManager authenticationManager() {
         return new ProviderManager(Collections.singletonList(jwtUserProvider()));
 //        return new ProviderManager(Arrays.asList(jwtUserProvider(), jwtStaffProvider()));
+    }
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring()
+                .requestMatchers("/openapi.yaml");
     }
 
     @Bean

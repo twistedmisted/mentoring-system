@@ -1,0 +1,194 @@
+openapi: 3.0.0
+info:
+  title: Mentoring System REST API
+  version: 0.0.1
+
+paths:
+  /api/v1/auth/login:
+    post:
+      tags:
+        - Authorization
+      summary: User authorization
+      description: Authorize user and return JWT token
+      responses:
+        '200':
+          description: A JSON map with JWT token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    example: 'xxxxxxxxxxx'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Bad request'
+        '500':
+          description: An internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Internal Server Error'
+  /api/v1/auth/register:
+    post:
+      tags:
+        - Authorization
+      summary: User registration
+      responses:
+        '201':
+          description: User was successfully registered
+        '400':
+          description: 1. The email is already registered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Bad request'
+        '500':
+          description: An internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Internal Server Error'
+  /api/v1/users:
+    get:
+      tags:
+        - User
+      summary: Returns a list of users.
+      responses:
+        '200':
+          description: A JSON map with user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        format: int64
+                        example: 123
+                      name:
+                        type: string
+                        example: "Name"
+                        minLength: 2
+                        maxLength: 50
+                      surname:
+                        type: string
+                        example: "Surname"
+                        minLength: 2
+                        maxLength: 50
+                      email:
+                        type: string
+                        example: "name.surname@email.com"
+                      status:
+                        type: string
+                        enum:
+                          - NEEDS_INFORMATION
+                          - ACTIVE
+                      role:
+                        type: string
+                        enum:
+                          - MENTOR
+                          - MENTEE
+        '404':
+          description: An error of not found user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Не вдається знайти даного користувача.'
+        '500':
+          description: An internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Internal Server Error'
+      security:
+        - jwt_token: [ ]
+  /api/v1/ranks:
+    get:
+      tags:
+        - Rank
+      summary: Returns a list of rank names
+      responses:
+        '200':
+          description: A JSON map with rank names
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ranks:
+                    type: array
+                    items:
+                      example: "rank"
+        '500':
+          description: An internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Internal Server Error'
+      security:
+        - jwt_token: []
+  /api/v1/specializations:
+    get:
+      tags:
+        - Specialization
+      summary: Returns a list of specialization names
+      responses:
+        '200':
+          description: A JSON map with specialization names
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ranks:
+                    type: array
+                    items:
+                      example: "specialization"
+        '500':
+          description: An internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Internal Server Error'
+      security:
+        - jwt_token: [ ]

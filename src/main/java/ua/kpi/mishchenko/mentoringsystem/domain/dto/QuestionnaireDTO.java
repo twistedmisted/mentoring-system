@@ -1,5 +1,6 @@
 package ua.kpi.mishchenko.mentoringsystem.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.List;
 @Data
 public class QuestionnaireDTO {
 
+    @JsonIgnore
     private Long userId;
     private String about;
     private List<String> skills;
