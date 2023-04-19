@@ -41,7 +41,7 @@ public class AuthController {
             authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     authenticationRequest.getEmail(), authenticationRequest.getPassword()));
         } catch (final BadCredentialsException ex) {
-            throw new ResponseStatusException(UNAUTHORIZED, "Не правильно введено пошту та пароль, первірте правильність вводу.");
+            throw new ResponseStatusException(UNAUTHORIZED, "Неправильно введено пошту або пароль, первірте правильність вводу.");
         }
         final AuthenticationResponse authenticationResponse = new AuthenticationResponse();
         authenticationResponse.setAccessToken(jwtTokenService.generateToken(authenticate));
