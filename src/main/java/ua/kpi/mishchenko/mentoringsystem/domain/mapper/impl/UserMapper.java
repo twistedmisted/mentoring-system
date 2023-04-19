@@ -5,9 +5,7 @@ import org.springframework.stereotype.Component;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.UserDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.entity.UserEntity;
 import ua.kpi.mishchenko.mentoringsystem.domain.mapper.Mapper;
-import ua.kpi.mishchenko.mentoringsystem.repository.RankRepository;
 import ua.kpi.mishchenko.mentoringsystem.repository.RoleRepository;
-import ua.kpi.mishchenko.mentoringsystem.repository.SpecializationRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,10 +16,7 @@ import static java.util.Objects.isNull;
 @RequiredArgsConstructor
 public class UserMapper implements Mapper<UserEntity, UserDTO> {
 
-    private final RoleMapper roleMapper;
     private final RoleRepository roleRepository;
-    private final SpecializationRepository specializationRepository;
-    private final RankRepository rankRepository;
 
     @Override
     public UserEntity dtoToEntity(UserDTO dto) {
