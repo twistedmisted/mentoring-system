@@ -1,8 +1,11 @@
 package ua.kpi.mishchenko.mentoringsystem.web.rest.api.v1.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.SchemaProperty;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -34,11 +37,13 @@ public class RankController {
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "The ranks were successfully received"
+                            description = "The ranks were successfully received",
+                            content = @Content(schema = @Schema(ref = "#/components/schemas/Ranks"))
                     ),
                     @ApiResponse(
                             responseCode = "403",
-                            description = "The access was forbidden"
+                            description = "The access was forbidden",
+                            content = @Content(schema = @Schema(ref = "#/components/schemas/Error"))
                     ),
                     @ApiResponse(
                             responseCode = "500",

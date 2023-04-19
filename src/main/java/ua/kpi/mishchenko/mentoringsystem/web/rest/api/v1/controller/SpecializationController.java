@@ -34,11 +34,13 @@ public class SpecializationController {
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "The specializations were successfully received"
+                            description = "The ranks were successfully received",
+                            content = @Content(schema = @Schema(ref = "#/components/schemas/Specializations"))
                     ),
                     @ApiResponse(
                             responseCode = "403",
-                            description = "The access was forbidden"
+                            description = "The access was forbidden",
+                            content = @Content(schema = @Schema(ref = "#/components/schemas/Error"))
                     ),
                     @ApiResponse(
                             responseCode = "500",
