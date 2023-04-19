@@ -24,6 +24,20 @@ import static org.springframework.http.HttpMethod.POST;
 @RequiredArgsConstructor
 public class JwtSecurityConfig {
 
+    private static final String[] AUTH_WHITELIST = {
+            // -- Swagger UI v2
+            "/v2/api-docs",
+            "/swagger-resources",
+            "/swagger-resources/**",
+            "/configuration/ui",
+            "/configuration/security",
+            "/swagger-ui.html",
+            "/webjars/**",
+            // -- Swagger UI v3 (OpenAPI)
+            "/v3/api-docs/**",
+            "/swagger-ui/**"
+    };
+
     private static final String API_PATH = "/api/v1";
     private static final String MENTOR_ROLE = "MENTOR";
     private static final String MENTEE_ROLE = "MENTEE";
@@ -61,6 +75,7 @@ public class JwtSecurityConfig {
                 .csrf().disable()
                 .authorizeHttpRequests()
                 .requestMatchers(POST, API_PATH + "/auth/**").permitAll()
+                .requestMatchers(AUTH_WHITELIST).permitAll()
 //                .requestMatchers(GET, API_PATH + "/recipes/{id}", API_PATH + "/recipes", API_PATH + "/categories", API_PATH + "/regions").permitAll()
 //                .requestMatchers(POST, API_PATH + "/recipes").hasRole(USER)
                 .anyRequest().hasAnyAuthority(MENTEE_ROLE, MENTOR_ROLE).and()

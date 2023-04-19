@@ -17,3 +17,9 @@ s3:
 
 jwt:
   secret: secretJWT123
+
+springdoc:
+  swagger-ui:
+    disable-swagger-default-url: true
+    tags-sorter: alpha
+    operations-sorter: method
