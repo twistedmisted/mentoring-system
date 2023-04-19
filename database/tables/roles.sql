@@ -6,3 +6,7 @@ CREATE TABLE roles
 
 ALTER TABLE roles
     ADD CONSTRAINT pk_roles PRIMARY KEY (id);
+
+INSERT INTO roles
+VALUES (default, 'MENTOR'),
+       (default, 'MENTEE');
