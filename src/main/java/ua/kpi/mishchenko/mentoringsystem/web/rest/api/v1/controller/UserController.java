@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.UserWithPassword;
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.UserWithPhoto;
 import ua.kpi.mishchenko.mentoringsystem.facade.MentoringSystemFacade;
@@ -40,8 +41,7 @@ public class UserController {
         Map<String, Object> responseBody = new HashMap<>();
         UserWithPhoto user = mentoringSystemFacade.getUserWithPhotoById(userId);
         if (isNull(user)) {
-            responseBody.put("message", "Не вдається знайти даного користувача.");
-            return new ResponseEntity<>(responseBody, NOT_FOUND);
+            throw new ResponseStatusException(NOT_FOUND, "Не вдається знайти даного користувача.");
         }
         responseBody.put("user", user);
         return new ResponseEntity<>(responseBody, OK);

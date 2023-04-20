@@ -13,6 +13,17 @@ spring:
     username: tw_admin
     password: rjUDALCZjEvYDU3sDPloMP3IESd0qSIp
     driver-class-name: org.postgresql.Driver
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: mentoring.system.ua@gmail.com
+    password: athitfoiwaowhibs
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 s3:
   access-key: AKIAVDELATUHYAGXDV4J

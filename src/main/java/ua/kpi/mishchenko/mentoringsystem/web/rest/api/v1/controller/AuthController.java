@@ -16,8 +16,13 @@ import org.springframework.web.server.ResponseStatusException;
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.AuthenticationRequest;
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.AuthenticationResponse;
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.RegistrationRequest;
+import ua.kpi.mishchenko.mentoringsystem.domain.payload.RestorePasswordRequest;
 import ua.kpi.mishchenko.mentoringsystem.service.security.JwtTokenService;
 import ua.kpi.mishchenko.mentoringsystem.service.security.RegistrationService;
+import ua.kpi.mishchenko.mentoringsystem.service.security.RestorePasswordService;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
@@ -33,7 +38,7 @@ public class AuthController {
     private final RegistrationService registrationService;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenService jwtTokenService;
-
+    private final RestorePasswordService restorePasswordService;
 
     @PostMapping(value = "/login", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<AuthenticationResponse> authenticateUser(@RequestBody @Valid final AuthenticationRequest authenticationRequest) {
@@ -54,5 +59,14 @@ public class AuthController {
         log.debug("Registration user with email = [{}]", user.getEmail());
         registrationService.registerUser(user);
         return new ResponseEntity<>(CREATED);
+    }
+
+    @PostMapping("/restore-password")
+    public ResponseEntity<Map<String, Object>> restorePassword(@Valid @RequestBody RestorePasswordRequest restorePasswordRequest) {
+        log.debug("Restoring user password by email = [{}]", restorePasswordRequest.getEmail());
+        restorePasswordService.restorePasswordByEmail(restorePasswordRequest.getEmail());
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("detail", "Новий пароль надіслано на пошту.");
+        return new ResponseEntity<>(responseBody, OK);
     }
 }

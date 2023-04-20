@@ -8,21 +8,22 @@ import lombok.Data;
 @Data
 public class RegistrationRequest {
 
-    @NotBlank(message = "Name is mandatory")
-    @Size(min = 2, max = 50, message = "The name must be between 2 and 50 symbols")
+    @NotBlank(message = "Необхідно ввести ім'я користувача.")
+    @Size(min = 2, max = 50, message = "Ім'я користувача має бути від 2 до 50 символів.")
     private String name;
 
-    @NotBlank(message = "Surname is mandatory")
-    @Size(min = 2, max = 50, message = "The surname must be between 2 and 50 symbols")
+    @NotBlank(message = "Необхідно ввести прізвище.")
+    @Size(min = 2, max = 50, message = "Прізвище має бути від 2 до 50 символів.")
     private String surname;
 
-    @NotBlank(message = "Name is mandatory")
-    @Email(message = "This is not an email")
+    @NotBlank(message = "Необіхдно ввести електронну пошту.")
+    @Email(message = "Електронну пошту введено некоректно.")
     private String email;
 
-    @NotBlank(message = "Password is mandatory")
-    @Size(min = 2, max = 50, message = "The password must be between 10 and 20 symbols")
+    @NotBlank(message = "Необхідно ввести пароль.")
+    @Size(min = 10, max = 20, message = "Пароль має бути від 10 до 20 символів.")
     private String password;
 
+    @NotBlank(message = "Необхідно обрати тип профілю.")
     private String role;
 }

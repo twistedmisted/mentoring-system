@@ -39,25 +39,51 @@ paths:
                     type: string
                     example: 'xxxxxxxxxxx'
         '400':
-          description: Bad Request
+          description: Body is invalid
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  message:
+                  type:
                     type: string
-                    example: 'Bad request'
-        '500':
-          description: An internal server error
+                    example: "about:blank"
+                  title:
+                    type: string
+                    example: "Bad Request"
+                  status:
+                    type: integer
+                    format: int32
+                    example: 400
+                  detail:
+                    type: string
+                    example: "Необіхдно ввести пароль."
+                  instance:
+                    type: string
+                    example: "/api/v1/auth/login"
+        '401':
+          description: Credentials are wrong
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  message:
+                  type:
                     type: string
-                    example: 'Internal Server Error'
+                    example: "about:blank"
+                  title:
+                    type: string
+                    example: "Bad Request"
+                  status:
+                    type: integer
+                    format: int32
+                    example: 401
+                  detail:
+                    type: string
+                    example: "Неправильно введено пошту або пароль, первірте правильність вводу."
+                  instance:
+                    type: string
+                    example: "/api/v1/auth/login"
   /api/v1/auth/register:
     post:
       tags:
@@ -102,7 +128,55 @@ paths:
         '201':
           description: User was successfully registered
         '400':
-          description: 1. The email is already registered
+          description: "1. The email is already registered\n2. Body is invalid"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: "about:blank"
+                  title:
+                    type: string
+                    example: "Bad Request"
+                  status:
+                    type: integer
+                    format: int32
+                    example: 400
+                  detail:
+                    type: string
+                    example: "Дана пошта вже зареєстрована, спробуйте іншу."
+                  instance:
+                    type: string
+                    example: "/api/v1/auth/register"
+#        '500':
+#          description: An internal server error
+#          content:
+#            application/json:
+#              schema:
+#                type: object
+#                properties:
+#                  message:
+#                    type: string
+#                    example: 'Internal Server Error'
+  /api/v1/auth/restore-password:
+    post:
+      tags:
+        - Authorization
+      summary: Restore user password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "name.surname@email.com"
+      responses:
+        '200':
+          description: Password was changed and sent to email
           content:
             application/json:
               schema:
@@ -110,17 +184,30 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: 'Bad request'
-        '500':
-          description: An internal server error
+                    example: "Новий пароль надіслано на пошту."
+        '404':
+          description: User by email was not found
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  message:
+                  type:
                     type: string
-                    example: 'Internal Server Error'
+                    example: "about:blank"
+                  title:
+                    type: string
+                    example: "Not Found"
+                  status:
+                    type: integer
+                    format: int32
+                    example: 404
+                  detail:
+                    type: string
+                    example: "Користувача з даною поштою не знайдено. Переконайтеся в правильності вводу."
+                  instance:
+                    type: string
+                    example: "/api/v1/auth/restore-password"
 
   /api/v1/users/{id}:
     get:
@@ -202,19 +289,22 @@ paths:
               schema:
                 type: object
                 properties:
-                  message:
+                  type:
                     type: string
-                    example: 'Не вдається знайти даного користувача.'
-        '500':
-          description: An internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
+                    example: "about:blank"
+                  title:
                     type: string
-                    example: 'Internal Server Error'
+                    example: "Not Found"
+                  status:
+                    type: integer
+                    format: int32
+                    example: 404
+                  detail:
+                    type: string
+                    example: "Не вдається знайти даного користувача."
+                  instance:
+                    type: string
+                    example: "/api/v1/users/1"
     put:
       tags:
         - User
@@ -289,6 +379,29 @@ paths:
       responses:
         '204':
           description: User information was updated successfully
+        '404':
+          description: An error of not found user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: "about:blank"
+                  title:
+                    type: string
+                    example: "Not Found"
+                  status:
+                    type: integer
+                    format: int32
+                    example: 404
+                  detail:
+                    type: string
+                    example: "Не вдається знайти такого користувача."
+                  instance:
+                    type: string
+                    example: "/api/v1/users/1"
       security:
         - jwt_token: [ ]
 #  /api/v1/users:
@@ -372,16 +485,7 @@ paths:
                     type: array
                     items:
                       example: "rank"
-        '500':
-          description: An internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: 'Internal Server Error'
+
   /api/v1/specializations:
     get:
       tags:
@@ -399,16 +503,6 @@ paths:
                     type: array
                     items:
                       example: "specialization"
-        '500':
-          description: An internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: 'Internal Server Error'
 
 components:
   schemas:

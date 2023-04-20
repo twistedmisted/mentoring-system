@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.QuestionnaireDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.UserDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.entity.QuestionnaireEntity;
@@ -19,6 +20,7 @@ import ua.kpi.mishchenko.mentoringsystem.service.UserService;
 import ua.kpi.mishchenko.mentoringsystem.service.security.JwtTokenService;
 
 import static java.util.Objects.isNull;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static ua.kpi.mishchenko.mentoringsystem.domain.util.UserStatus.ACTIVE;
 
 @Service
@@ -46,7 +48,7 @@ public class UserServiceImpl implements UserService {
         log.debug("Updating user information by id = [{}]", userId);
         if (!existsById(userId)) {
             log.warn("The user with id = [{}] does not exist", userId);
-            throw new IllegalArgumentException("Cannot find user with id = [" + userId + "]");
+            throw new ResponseStatusException(NOT_FOUND, "Не вдається знайти такого користувача.");
         }
         UserEntity userEntity = userRepository.findById(userId).get();
         updateUserInformation(userDTO, userEntity);
