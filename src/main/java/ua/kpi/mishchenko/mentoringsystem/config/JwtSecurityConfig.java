@@ -19,6 +19,7 @@ import ua.kpi.mishchenko.mentoringsystem.web.rest.api.v1.filter.JwtUserRequestFi
 
 import java.util.Collections;
 
+import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 
 @Configuration
@@ -83,7 +84,7 @@ public class JwtSecurityConfig {
                 .authorizeHttpRequests()
                 .requestMatchers(POST, API_PATH + "/auth/**").permitAll()
                 .requestMatchers(AUTH_WHITELIST).permitAll()
-//                .requestMatchers(GET, API_PATH + "/recipes/{id}", API_PATH + "/recipes", API_PATH + "/categories", API_PATH + "/regions").permitAll()
+                .requestMatchers(GET, API_PATH + "/users/{id}", API_PATH + "/users", API_PATH + "/ranks", API_PATH + "/specializations").permitAll()
 //                .requestMatchers(POST, API_PATH + "/recipes").hasRole(USER)
                 .anyRequest().hasAnyAuthority(MENTEE_ROLE, MENTOR_ROLE).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()

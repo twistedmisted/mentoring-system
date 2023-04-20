@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.QuestionnaireDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.entity.QuestionnaireEntity;
 import ua.kpi.mishchenko.mentoringsystem.domain.mapper.Mapper;
+import ua.kpi.mishchenko.mentoringsystem.repository.RankRepository;
+import ua.kpi.mishchenko.mentoringsystem.repository.SpecializationRepository;
 import ua.kpi.mishchenko.mentoringsystem.repository.UserRepository;
 
 import java.util.ArrayList;
@@ -16,9 +18,9 @@ import static java.util.Objects.isNull;
 @RequiredArgsConstructor
 public class QuestionnaireMapper implements Mapper<QuestionnaireEntity, QuestionnaireDTO> {
 
-    private final RankMapper rankMapper;
-    private final SpecializationMapper specializationMapper;
     private final UserRepository userRepository;
+    private final RankRepository rankRepository;
+    private final SpecializationRepository specializationRepository;
 
     @Override
     public QuestionnaireEntity dtoToEntity(QuestionnaireDTO dto) {
@@ -30,8 +32,8 @@ public class QuestionnaireMapper implements Mapper<QuestionnaireEntity, Question
         entity.setAbout(dto.getAbout());
         entity.setSkills(dto.getSkills());
         entity.setCompanies(dto.getCompanies());
-        entity.setRank(rankMapper.dtoToEntity(dto.getRank()));
-        entity.setSpecialization(specializationMapper.dtoToEntity(dto.getSpecialization()));
+        entity.setRank(rankRepository.findByName(dto.getRank()).get());
+        entity.setSpecialization(specializationRepository.findByName(dto.getSpecialization()).get());
         entity.setLinkedin(dto.getLinkedin());
         entity.setHoursPerWeek(dto.getHoursPerWeek());
         entity.setUser(userRepository.findById(dto.getUserId()).get());
@@ -48,8 +50,8 @@ public class QuestionnaireMapper implements Mapper<QuestionnaireEntity, Question
         dto.setAbout(entity.getAbout());
         dto.setSkills(entity.getSkills());
         dto.setCompanies(entity.getCompanies());
-        dto.setRank(rankMapper.entityToDto(entity.getRank()));
-        dto.setSpecialization(specializationMapper.entityToDto(entity.getSpecialization()));
+        dto.setRank(entity.getRank().getName());
+        dto.setSpecialization(entity.getSpecialization().getName());
         dto.setLinkedin(entity.getLinkedin());
         dto.setHoursPerWeek(entity.getHoursPerWeek());
         return dto;

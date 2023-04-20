@@ -21,6 +21,7 @@ public class RankMapper implements Mapper<RankEntity, RankDTO> {
         RankEntity entity = new RankEntity();
         entity.setId(dto.getId());
         entity.setName(dto.getName());
+        entity.setLevel(dto.getLevel());
         return entity;
     }
 
@@ -32,6 +33,7 @@ public class RankMapper implements Mapper<RankEntity, RankDTO> {
         RankDTO dto = new RankDTO();
         dto.setId(entity.getId());
         dto.setName(entity.getName());
+        dto.setLevel(entity.getLevel());
         return dto;
     }
 

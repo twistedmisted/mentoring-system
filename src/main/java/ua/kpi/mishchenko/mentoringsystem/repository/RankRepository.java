@@ -14,6 +14,6 @@ public interface RankRepository extends CrudRepository<RankEntity, Long> {
 
     Optional<RankEntity> findByName(String name);
 
-    @Query(value = "SELECT r.name as name FROM RankEntity r ORDER BY r.id")
+    @Query(value = "SELECT r.name as name FROM RankEntity r ORDER BY r.level ASC")
     List<RankNameOnly> findProjections();
 }

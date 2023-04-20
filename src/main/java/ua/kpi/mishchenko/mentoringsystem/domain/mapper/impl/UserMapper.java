@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.UserDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.entity.UserEntity;
 import ua.kpi.mishchenko.mentoringsystem.domain.mapper.Mapper;
+import ua.kpi.mishchenko.mentoringsystem.domain.payload.UserWithPassword;
 import ua.kpi.mishchenko.mentoringsystem.repository.RoleRepository;
 
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import static java.util.Objects.isNull;
 public class UserMapper implements Mapper<UserEntity, UserDTO> {
 
     private final RoleRepository roleRepository;
+    private final QuestionnaireMapper questionnaireMapper;
 
     @Override
     public UserEntity dtoToEntity(UserDTO dto) {
@@ -31,6 +33,7 @@ public class UserMapper implements Mapper<UserEntity, UserDTO> {
         entity.setPassword(dto.getPassword());
         entity.setStatus(dto.getStatus());
         entity.setRole(roleRepository.findByName(dto.getRole()).get());
+        entity.setQuestionnaire(questionnaireMapper.dtoToEntity(dto.getQuestionnaire()));
         return entity;
     }
 
@@ -47,6 +50,7 @@ public class UserMapper implements Mapper<UserEntity, UserDTO> {
         dto.setPassword(entity.getPassword());
         dto.setStatus(entity.getStatus());
         dto.setRole(entity.getRole().getName());
+        dto.setQuestionnaire(questionnaireMapper.entityToDto(entity.getQuestionnaire()));
         return dto;
     }
 
@@ -72,5 +76,21 @@ public class UserMapper implements Mapper<UserEntity, UserDTO> {
             dtos.add(entityToDto(entity));
         }
         return dtos;
+    }
+
+    public UserDTO userWithPasswordToDto(UserWithPassword user) {
+        if(isNull(user)) {
+            return null;
+        }
+        UserDTO dto = new UserDTO();
+        dto.setId(user.getId());
+        dto.setName(user.getName());
+        dto.setSurname(user.getSurname());
+        dto.setEmail(user.getEmail());
+        dto.setPassword(user.getPassword());
+        dto.setRole(user.getRole());
+        dto.setStatus(user.getStatus());
+        dto.setQuestionnaire(user.getQuestionnaire());
+        return dto;
     }
 }

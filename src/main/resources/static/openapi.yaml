@@ -10,6 +10,23 @@ paths:
         - Authorization
       summary: User authorization
       description: Authorize user and return JWT token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "user.surname@email.com"
+                password:
+                  type: string
+                  minLength: 10
+                  maxLength: 20
+                  example: "somepassword"
+              required:
+                - email
+                - password
       responses:
         '200':
           description: A JSON map with JWT token
@@ -46,6 +63,41 @@ paths:
       tags:
         - Authorization
       summary: User registration
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 2
+                  maxLength: 50
+                  example: "Name"
+                surname:
+                  type: string
+                  minLength: 2
+                  maxLength: 50
+                  example: "Surname"
+                email:
+                  type: string
+                  example: "user.surname@email.com"
+                password:
+                  type: string
+                  minLength: 10
+                  maxLength: 20
+                  example: "somepassword"
+                role:
+                  type: string
+                  enum:
+                    - MENTOR
+                    - MENTEE
+              required:
+                - name
+                - surname
+                - email
+                - password
+                - role
       responses:
         '201':
           description: User was successfully registered
@@ -69,11 +121,17 @@ paths:
                   message:
                     type: string
                     example: 'Internal Server Error'
-  /api/v1/users:
+
+  /api/v1/users/{id}:
     get:
       tags:
         - User
-      summary: Returns a list of users.
+      summary: Return an user
+      parameters:
+        - in: "path"
+          name: "id"
+          required: true
+          example: "1"
       responses:
         '200':
           description: A JSON map with user
@@ -82,36 +140,61 @@ paths:
               schema:
                 type: object
                 properties:
-                  user:
+                  id:
+                    type: integer
+                    format: int64
+                    example: 123
+                  name:
+                    type: string
+                    example: "Name"
+                    minLength: 2
+                    maxLength: 50
+                  surname:
+                    type: string
+                    example: "Surname"
+                    minLength: 2
+                    maxLength: 50
+                  email:
+                    type: string
+                    example: "name.surname@email.com"
+                  status:
+                    type: string
+                    enum:
+                      - NEEDS_INFORMATION
+                      - ACTIVE
+                  role:
+                    type: string
+                    enum:
+                      - MENTOR
+                      - MENTEE
+                  questionnaire:
                     type: object
                     properties:
-                      id:
-                        type: integer
-                        format: int64
-                        example: 123
-                      name:
+                      about:
                         type: string
-                        example: "Name"
-                        minLength: 2
-                        maxLength: 50
-                      surname:
+                        minLength: 250
+                        maxLength: 1024
+                        example: "Some information about user"
+                      skills:
+                        type: array
+                        items:
+                          example: "Skill"
+                      companies:
+                        type: array
+                        items:
+                          example: "Company"
+                      rank:
                         type: string
-                        example: "Surname"
-                        minLength: 2
-                        maxLength: 50
-                      email:
+                        example: "Rank"
+                      specialization:
                         type: string
-                        example: "name.surname@email.com"
-                      status:
-                        type: string
-                        enum:
-                          - NEEDS_INFORMATION
-                          - ACTIVE
-                      role:
-                        type: string
-                        enum:
-                          - MENTOR
-                          - MENTEE
+                        example: "Specialization"
+                      hoursPerWeek:
+                        type: number
+                        example: 20.5
+                  profilePhotoUrl:
+                    type: string
+                    example: "https://url.com/profile-photo.jpg"
         '404':
           description: An error of not found user
           content:
@@ -132,8 +215,146 @@ paths:
                   message:
                     type: string
                     example: 'Internal Server Error'
+    put:
+      tags:
+        - User
+      summary: Update user information
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      format: int64
+                      example: 123
+                    name:
+                      type: string
+                      example: "Name"
+                      minLength: 2
+                      maxLength: 50
+                    surname:
+                      type: string
+                      example: "Surname"
+                      minLength: 2
+                      maxLength: 50
+                    email:
+                      type: string
+                      example: "name.surname@email.com"
+                    status:
+                      type: string
+                      enum:
+                        - NEEDS_INFORMATION
+                        - ACTIVE
+                    role:
+                      type: string
+                      enum:
+                        - MENTOR
+                        - MENTEE
+                    questionnaire:
+                      type: object
+                      properties:
+                        about:
+                          type: string
+                          minLength: 250
+                          maxLength: 1024
+                          example: "Some information about user"
+                        skills:
+                          type: array
+                          items:
+                            example: "Skill"
+                        companies:
+                          type: array
+                          items:
+                            example: "Company"
+                        rank:
+                          type: string
+                          example: "Rank"
+                        specialization:
+                          type: string
+                          example: "Specialization"
+                        hoursPerWeek:
+                          type: number
+                          example: 20.5
+                photo:
+                  type: string
+                  format: binary
+            encoding:
+              photo:
+                contentType: image/png, image/jpg
+      responses:
+        '204':
+          description: User information was updated successfully
       security:
         - jwt_token: [ ]
+#  /api/v1/users:
+#    get:
+#      tags:
+#        - User
+#      summary: Returns a list of users.
+#      responses:
+#        '200':
+#          description: A JSON map with user
+#          content:
+#            application/json:
+#              schema:
+#                type: object
+#                properties:
+#                  user:
+#                    type: object
+#                    properties:
+#                      id:
+#                        type: integer
+#                        format: int64
+#                        example: 123
+#                      name:
+#                        type: string
+#                        example: "Name"
+#                        minLength: 2
+#                        maxLength: 50
+#                      surname:
+#                        type: string
+#                        example: "Surname"
+#                        minLength: 2
+#                        maxLength: 50
+#                      email:
+#                        type: string
+#                        example: "name.surname@email.com"
+#                      status:
+#                        type: string
+#                        enum:
+#                          - NEEDS_INFORMATION
+#                          - ACTIVE
+#                      role:
+#                        type: string
+#                        enum:
+#                          - MENTOR
+#                          - MENTEE
+#        '404':
+#          description: An error of not found user
+#          content:
+#            application/json:
+#              schema:
+#                type: object
+#                properties:
+#                  message:
+#                    type: string
+#                    example: 'Не вдається знайти даного користувача.'
+#        '500':
+#          description: An internal server error
+#          content:
+#            application/json:
+#              schema:
+#                type: object
+#                properties:
+#                  message:
+#                    type: string
+#                    example: 'Internal Server Error'
+
   /api/v1/ranks:
     get:
       tags:
@@ -161,8 +382,6 @@ paths:
                   message:
                     type: string
                     example: 'Internal Server Error'
-      security:
-        - jwt_token: []
   /api/v1/specializations:
     get:
       tags:
@@ -190,5 +409,61 @@ paths:
                   message:
                     type: string
                     example: 'Internal Server Error'
-      security:
-        - jwt_token: [ ]
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 123
+        name:
+          type: string
+          example: "Name"
+          minLength: 2
+          maxLength: 50
+        surname:
+          type: string
+          example: "Surname"
+          minLength: 2
+          maxLength: 50
+        email:
+          type: string
+          example: "name.surname@email.com"
+        status:
+          type: string
+          enum:
+            - NEEDS_INFORMATION
+            - ACTIVE
+        role:
+          type: string
+          enum:
+            - MENTOR
+            - MENTEE
+        questionnaire:
+          type: object
+          properties:
+            about:
+              type: string
+              minLength: 250
+              maxLength: 1024
+              example: "Some information about user"
+            skills:
+              type: array
+              items:
+                example: "Skill"
+            companies:
+              type: array
+              items:
+                example: "Company"
+            rank:
+              type: string
+              example: "Rank"
+            specialization:
+              type: string
+              example: "Specialization"
+            hoursPerWeek:
+              type: number
+              example: 20.5

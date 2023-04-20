@@ -18,7 +18,7 @@ import java.util.List;
 public class S3ServiceImpl implements S3Service {
 
     private static final String BUCKET_NAME = "mentoring-system";
-    private static final String PROFILE_PHOTO = "profile-photo";
+    public static final String PROFILE_PHOTO = "profile-photo";
     private static final String USERS_FOLDER = "users";
     private static final String SLASH = "/";
 

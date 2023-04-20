@@ -52,20 +52,4 @@ public class QuestionnaireEntity {
     @MapsId
     @JoinColumn(name = "user_id")
     private UserEntity user;
-
-    public void addSkill(String skill) {
-        skills.add(skill);
-    }
-
-    public void removeSkill(String skill) {
-        skills.remove(skill);
-    }
-
-    public void addCompany(String company) {
-        companies.add(company);
-    }
-
-    public void removeCompany(String company) {
-        companies.remove(company);
-    }
 }

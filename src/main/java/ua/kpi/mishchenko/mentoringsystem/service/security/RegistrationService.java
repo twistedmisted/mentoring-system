@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import ua.kpi.mishchenko.mentoringsystem.domain.bo.RegistrationRequest;
 import ua.kpi.mishchenko.mentoringsystem.domain.entity.UserEntity;
+import ua.kpi.mishchenko.mentoringsystem.domain.payload.RegistrationRequest;
 import ua.kpi.mishchenko.mentoringsystem.repository.RoleRepository;
 import ua.kpi.mishchenko.mentoringsystem.repository.UserRepository;
 

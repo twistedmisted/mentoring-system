@@ -27,6 +27,9 @@ public class RankEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "level", nullable = false)
+    private Integer level;
+
     @OneToMany(mappedBy = "rank")
     private List<QuestionnaireEntity> questionnaires = new ArrayList<>();
 }
