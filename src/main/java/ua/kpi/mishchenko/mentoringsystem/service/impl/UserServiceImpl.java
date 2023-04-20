@@ -2,6 +2,8 @@ package ua.kpi.mishchenko.mentoringsystem.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,20 +15,32 @@ import ua.kpi.mishchenko.mentoringsystem.domain.entity.RankEntity;
 import ua.kpi.mishchenko.mentoringsystem.domain.entity.SpecializationEntity;
 import ua.kpi.mishchenko.mentoringsystem.domain.entity.UserEntity;
 import ua.kpi.mishchenko.mentoringsystem.domain.mapper.impl.UserMapper;
+import ua.kpi.mishchenko.mentoringsystem.domain.payload.PageBO;
+import ua.kpi.mishchenko.mentoringsystem.domain.util.UserFilter;
 import ua.kpi.mishchenko.mentoringsystem.repository.RankRepository;
 import ua.kpi.mishchenko.mentoringsystem.repository.SpecializationRepository;
 import ua.kpi.mishchenko.mentoringsystem.repository.UserRepository;
 import ua.kpi.mishchenko.mentoringsystem.service.UserService;
 import ua.kpi.mishchenko.mentoringsystem.service.security.JwtTokenService;
 
+import java.util.List;
+
 import static java.util.Objects.isNull;
+import static org.springframework.data.jpa.domain.Specification.where;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static ua.kpi.mishchenko.mentoringsystem.domain.entity.specification.UserSpecification.matchHoursPerWeek;
+import static ua.kpi.mishchenko.mentoringsystem.domain.entity.specification.UserSpecification.matchRank;
+import static ua.kpi.mishchenko.mentoringsystem.domain.entity.specification.UserSpecification.matchSpecialization;
+import static ua.kpi.mishchenko.mentoringsystem.domain.entity.specification.UserSpecification.matchStatus;
 import static ua.kpi.mishchenko.mentoringsystem.domain.util.UserStatus.ACTIVE;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class UserServiceImpl implements UserService {
+
+    private static final int PAGE_SIZE = 5;
 
     private final UserRepository userRepository;
     private final RankRepository rankRepository;
@@ -40,6 +54,32 @@ public class UserServiceImpl implements UserService {
         log.debug("Getting user by id = [{}]", userId);
         UserEntity userEntity = userRepository.findById(userId).orElse(null);
         return userMapper.entityToDto(userEntity);
+    }
+
+    @Override
+    public PageBO<UserDTO> getUsers(UserFilter userFilter, int numberOfPage) {
+        log.debug("Getting all users by filter");
+        if (lessThanOne(numberOfPage)) {
+            log.warn("The number of page and size of page must be greater than zero");
+            throw new ResponseStatusException(BAD_REQUEST, "Номер сторінки не може бути менше 1.");
+        }
+        Page<UserEntity> userPage = userRepository.findAll(where(matchSpecialization(userFilter.getSpecializations()))
+                .and(matchRank(userFilter.getRank()))
+                .and(matchHoursPerWeek(userFilter.getHoursPerWeek()))
+                .and(matchStatus(userFilter.getStatus())), PageRequest.of(numberOfPage - 1, PAGE_SIZE));
+        if (!userPage.hasContent()) {
+            log.debug("Cannot find users with this filter parameters");
+            return new PageBO<>(numberOfPage, userPage.getTotalPages());
+        }
+        List<UserDTO> userDtos = userPage.getContent()
+                .stream()
+                .map(userMapper::entityToDto)
+                .toList();
+        return new PageBO<>(userDtos, numberOfPage, userPage.getTotalPages());
+    }
+
+    private boolean lessThanOne(int numberOfPage) {
+        return numberOfPage < 1;
     }
 
     @Override

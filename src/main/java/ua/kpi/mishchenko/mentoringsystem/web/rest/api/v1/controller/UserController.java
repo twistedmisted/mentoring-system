@@ -4,20 +4,26 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+import ua.kpi.mishchenko.mentoringsystem.domain.payload.PageBO;
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.UserWithPassword;
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.UserWithPhoto;
+import ua.kpi.mishchenko.mentoringsystem.domain.util.UserFilter;
+import ua.kpi.mishchenko.mentoringsystem.domain.util.UserStatus;
 import ua.kpi.mishchenko.mentoringsystem.facade.MentoringSystemFacade;
 
 import java.security.Principal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static java.util.Objects.isNull;
@@ -31,8 +37,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class UserController {
 
+    private static final UserStatus ACTIVE = UserStatus.ACTIVE;
     private final MentoringSystemFacade mentoringSystemFacade;
 
     @GetMapping(value = "/{userId}", produces = APPLICATION_JSON_VALUE)
@@ -44,6 +52,23 @@ public class UserController {
             throw new ResponseStatusException(NOT_FOUND, "Не вдається знайти даного користувача.");
         }
         responseBody.put("user", user);
+        return new ResponseEntity<>(responseBody, OK);
+    }
+
+    @GetMapping
+    public ResponseEntity<Map<String, Object>> getActiveUsers(@RequestParam(required = false) List<String> specializations,
+                                                              @RequestParam(required = false) Double hoursPerWeek,
+                                                              @RequestParam(required = false) String rank,
+                                                              @RequestParam(value = "page", required = false, defaultValue = "1") int numberOfPage) {
+        log.debug("Getting users with 'ACTIVE' status");
+        PageBO<UserWithPhoto> userPage = mentoringSystemFacade.getUsers(UserFilter.builder()
+                .specializations(specializations)
+                .rank(rank)
+                .hoursPerWeek(hoursPerWeek)
+                .status(ACTIVE)
+                .build(), numberOfPage);
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("page", userPage);
         return new ResponseEntity<>(responseBody, OK);
     }
 
