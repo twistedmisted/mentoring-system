@@ -40,36 +40,64 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Validated
 public class UserController {
 
+    private static final String MENTOR_ROLE = "MENTOR";
+    private static final String MENTEE_ROLE = "MENTEE";
+
     private static final UserStatus ACTIVE = UserStatus.ACTIVE;
     private final MentoringSystemFacade mentoringSystemFacade;
 
     @GetMapping(value = "/{userId}", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> getUserById(@PathVariable Long userId) {
+    public ResponseEntity<Map<String, Object>> getUserById(@PathVariable Long userId, Principal principal) {
         log.debug("Getting user by id = [{}]", userId);
         Map<String, Object> responseBody = new HashMap<>();
         UserWithPhoto user = mentoringSystemFacade.getUserWithPhotoById(userId);
-        if (isNull(user)) {
+        if (isNull(user) || checkPermissionForNotActiveUser(principal, user.getEmail(), user.getStatus())) {
             throw new ResponseStatusException(NOT_FOUND, "Не вдається знайти даного користувача.");
         }
         responseBody.put("user", user);
         return new ResponseEntity<>(responseBody, OK);
     }
 
-    @GetMapping
-    public ResponseEntity<Map<String, Object>> getActiveUsers(@RequestParam(required = false) List<String> specializations,
-                                                              @RequestParam(required = false) Double hoursPerWeek,
-                                                              @RequestParam(required = false) String rank,
-                                                              @RequestParam(value = "page", required = false, defaultValue = "1") int numberOfPage) {
-        log.debug("Getting users with 'ACTIVE' status");
-        PageBO<UserWithPhoto> userPage = mentoringSystemFacade.getUsers(UserFilter.builder()
+    private boolean checkPermissionForNotActiveUser(Principal principal, String email, UserStatus status) {
+        return (isNull(principal) || !principal.getName().equals(email)) && !status.equals(ACTIVE);
+    }
+
+    @GetMapping("/mentors")
+    public ResponseEntity<Map<String, Object>> getActiveMentors(@RequestParam(required = false) List<String> specializations,
+                                                                @RequestParam(required = false) Double hoursPerWeek,
+                                                                @RequestParam(required = false) String rank,
+                                                                @RequestParam(value = "page", required = false, defaultValue = "1") int numberOfPage) {
+        Map<String, Object> responseBody = getUsersByFilter(UserFilter.builder()
                 .specializations(specializations)
                 .rank(rank)
                 .hoursPerWeek(hoursPerWeek)
                 .status(ACTIVE)
+                .role(MENTOR_ROLE)
                 .build(), numberOfPage);
+        return new ResponseEntity<>(responseBody, OK);
+    }
+
+    @GetMapping("/mentees")
+    public ResponseEntity<Map<String, Object>> getActiveMentees(@RequestParam(required = false) List<String> specializations,
+                                                                @RequestParam(required = false) Double hoursPerWeek,
+                                                                @RequestParam(required = false) String rank,
+                                                                @RequestParam(value = "page", required = false, defaultValue = "1") int numberOfPage) {
+        Map<String, Object> responseBody = getUsersByFilter(UserFilter.builder()
+                .specializations(specializations)
+                .rank(rank)
+                .hoursPerWeek(hoursPerWeek)
+                .status(ACTIVE)
+                .role(MENTEE_ROLE)
+                .build(), numberOfPage);
+        return new ResponseEntity<>(responseBody, OK);
+    }
+
+    private Map<String, Object> getUsersByFilter(UserFilter userFilter, int numberOfPage) {
+        log.debug("Getting users with status = [{}] and role = [{}]", ACTIVE, MENTEE_ROLE);
+        PageBO<UserWithPhoto> userPage = mentoringSystemFacade.getUsers(userFilter, numberOfPage);
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("page", userPage);
-        return new ResponseEntity<>(responseBody, OK);
+        return responseBody;
     }
 
     @PutMapping("/{userId}")

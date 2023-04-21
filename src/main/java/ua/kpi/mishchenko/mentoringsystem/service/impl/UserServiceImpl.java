@@ -32,6 +32,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static ua.kpi.mishchenko.mentoringsystem.domain.entity.specification.UserSpecification.matchHoursPerWeek;
 import static ua.kpi.mishchenko.mentoringsystem.domain.entity.specification.UserSpecification.matchRank;
+import static ua.kpi.mishchenko.mentoringsystem.domain.entity.specification.UserSpecification.matchRole;
 import static ua.kpi.mishchenko.mentoringsystem.domain.entity.specification.UserSpecification.matchSpecialization;
 import static ua.kpi.mishchenko.mentoringsystem.domain.entity.specification.UserSpecification.matchStatus;
 import static ua.kpi.mishchenko.mentoringsystem.domain.util.UserStatus.ACTIVE;
@@ -78,7 +79,8 @@ public class UserServiceImpl implements UserService {
         Page<UserEntity> userPage = userRepository.findAll(where(matchSpecialization(userFilter.getSpecializations()))
                 .and(matchRank(userFilter.getRank()))
                 .and(matchHoursPerWeek(userFilter.getHoursPerWeek()))
-                .and(matchStatus(userFilter.getStatus())), PageRequest.of(numberOfPage - 1, PAGE_SIZE));
+                .and(matchStatus(userFilter.getStatus()))
+                .and(matchRole(userFilter.getRole())), PageRequest.of(numberOfPage - 1, PAGE_SIZE));
         if (!userPage.hasContent()) {
             log.debug("Cannot find users with this filter parameters");
             return new PageBO<>(numberOfPage, userPage.getTotalPages());

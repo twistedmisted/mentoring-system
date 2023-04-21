@@ -150,16 +150,16 @@ paths:
                   instance:
                     type: string
                     example: "/api/v1/auth/register"
-#        '500':
-#          description: An internal server error
-#          content:
-#            application/json:
-#              schema:
-#                type: object
-#                properties:
-#                  message:
-#                    type: string
-#                    example: 'Internal Server Error'
+  #        '500':
+  #          description: An internal server error
+  #          content:
+  #            application/json:
+  #              schema:
+  #                type: object
+  #                properties:
+  #                  message:
+  #                    type: string
+  #                    example: 'Internal Server Error'
   /api/v1/auth/restore-password:
     post:
       tags:
@@ -249,6 +249,9 @@ paths:
                     enum:
                       - NEEDS_INFORMATION
                       - ACTIVE
+                  createdAt:
+                    type: string
+                    example: "21.04.2023"
                   role:
                     type: string
                     enum:
@@ -404,69 +407,313 @@ paths:
                     example: "/api/v1/users/1"
       security:
         - jwt_token: [ ]
-#  /api/v1/users:
-#    get:
-#      tags:
-#        - User
-#      summary: Returns a list of users.
-#      responses:
-#        '200':
-#          description: A JSON map with user
-#          content:
-#            application/json:
-#              schema:
-#                type: object
-#                properties:
-#                  user:
-#                    type: object
-#                    properties:
-#                      id:
-#                        type: integer
-#                        format: int64
-#                        example: 123
-#                      name:
-#                        type: string
-#                        example: "Name"
-#                        minLength: 2
-#                        maxLength: 50
-#                      surname:
-#                        type: string
-#                        example: "Surname"
-#                        minLength: 2
-#                        maxLength: 50
-#                      email:
-#                        type: string
-#                        example: "name.surname@email.com"
-#                      status:
-#                        type: string
-#                        enum:
-#                          - NEEDS_INFORMATION
-#                          - ACTIVE
-#                      role:
-#                        type: string
-#                        enum:
-#                          - MENTOR
-#                          - MENTEE
-#        '404':
-#          description: An error of not found user
-#          content:
-#            application/json:
-#              schema:
-#                type: object
-#                properties:
-#                  message:
-#                    type: string
-#                    example: 'Не вдається знайти даного користувача.'
-#        '500':
-#          description: An internal server error
-#          content:
-#            application/json:
-#              schema:
-#                type: object
-#                properties:
-#                  message:
-#                    type: string
-#                    example: 'Internal Server Error'
+  /api/v1/users/mentors:
+    get:
+      tags:
+        - User
+      summary: Return a page with mentors
+      parameters:
+        - in: "path"
+          name: "rank"
+          required: false
+          example: "Trainee"
+        - in: "path"
+          name: "specializations"
+          required: false
+          example: "JavaScript,Java"
+        - in: "path"
+          name: "hoursPerWeek"
+          required: false
+          example: "40.5"
+        - in: "path"
+          name: "page"
+          required: false
+          example: 2
+      responses:
+        '200':
+          description: A JSON map with page of mentors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  page:
+                    type: object
+                    properties:
+                      content:
+                        type: array
+                        items:
+                          properties:
+                            id:
+                              type: integer
+                              format: int64
+                              example: 123
+                            name:
+                              type: string
+                              example: "Name"
+                              minLength: 2
+                              maxLength: 50
+                            surname:
+                              type: string
+                              example: "Surname"
+                              minLength: 2
+                              maxLength: 50
+                            email:
+                              type: string
+                              example: "name.surname@email.com"
+                            status:
+                              type: string
+                              example: ACTIVE
+                            createdAt:
+                              type: string
+                              example: "21.04.2023"
+                            role:
+                              type: string
+                              example: MENTOR
+                            questionnaire:
+                              type: object
+                              properties:
+                                about:
+                                  type: string
+                                  minLength: 250
+                                  maxLength: 1024
+                                  example: "Some information about user"
+                                skills:
+                                  type: array
+                                  items:
+                                    example: "Skill"
+                                companies:
+                                  type: array
+                                  items:
+                                    example: "Company"
+                                rank:
+                                  type: string
+                                  example: "Rank"
+                                specialization:
+                                  type: string
+                                  example: "Specialization"
+                                hoursPerWeek:
+                                  type: number
+                                  example: 20.5
+                            profilePhotoUrl:
+                              type: string
+                              example: "https://url.com/profile-photo.jpg"
+                      currentPageNumber:
+                        type: integer
+                        format: int32
+                        example: "1"
+                      totalPages:
+                        type: integer
+                        format: int32
+                        example: "10"
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: "about:blank"
+                  title:
+                    type: string
+                    example: "Bad Request"
+                  status:
+                    type: integer
+                    format: int32
+                    example: 400
+                  detail:
+                    type: string
+                    example: "Номер сторінки не може бути менше 1."
+                  instance:
+                    type: string
+                    example: "/api/v1/users/mentors"
+  /api/v1/users/mentees:
+    get:
+      tags:
+        - User
+      summary: Return a page with mentees
+      parameters:
+        - in: "path"
+          name: "rank"
+          required: false
+          example: "Trainee"
+        - in: "path"
+          name: "specializations"
+          required: false
+          example: "JavaScript,Java"
+        - in: "path"
+          name: "hoursPerWeek"
+          required: false
+          example: "40.5"
+        - in: "path"
+          name: "page"
+          required: false
+          example: 2
+      responses:
+        '200':
+          description: A JSON map with page of mentees
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  page:
+                    type: object
+                    properties:
+                      content:
+                        type: array
+                        items:
+                          properties:
+                            id:
+                              type: integer
+                              format: int64
+                              example: 123
+                            name:
+                              type: string
+                              example: "Name"
+                              minLength: 2
+                              maxLength: 50
+                            surname:
+                              type: string
+                              example: "Surname"
+                              minLength: 2
+                              maxLength: 50
+                            email:
+                              type: string
+                              example: "name.surname@email.com"
+                            status:
+                              type: string
+                              example: ACTIVE
+                            createdAt:
+                              type: string
+                              example: "21.04.2023"
+                            role:
+                              type: string
+                              example: MENTEE
+                            questionnaire:
+                              type: object
+                              properties:
+                                about:
+                                  type: string
+                                  minLength: 250
+                                  maxLength: 1024
+                                  example: "Some information about user"
+                                skills:
+                                  type: array
+                                  items:
+                                    example: "Skill"
+                                companies:
+                                  type: array
+                                  items:
+                                    example: "Company"
+                                rank:
+                                  type: string
+                                  example: "Rank"
+                                specialization:
+                                  type: string
+                                  example: "Specialization"
+                                hoursPerWeek:
+                                  type: number
+                                  example: 20.5
+                            profilePhotoUrl:
+                              type: string
+                              example: "https://url.com/profile-photo.jpg"
+                      currentPageNumber:
+                        type: integer
+                        format: int32
+                        example: "1"
+                      totalPages:
+                        type: integer
+                        format: int32
+                        example: "10"
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: "about:blank"
+                  title:
+                    type: string
+                    example: "Bad Request"
+                  status:
+                    type: integer
+                    format: int32
+                    example: 400
+                  detail:
+                    type: string
+                    example: "Номер сторінки не може бути менше 1."
+                  instance:
+                    type: string
+                    example: "/api/v1/users/mentees"
+  #  /api/v1/users:
+  #    get:
+  #      tags:
+  #        - User
+  #      summary: Returns a list of users.
+  #      responses:
+  #        '200':
+  #          description: A JSON map with user
+  #          content:
+  #            application/json:
+  #              schema:
+  #                type: object
+  #                properties:
+  #                  user:
+  #                    type: object
+  #                    properties:
+  #                      id:
+  #                        type: integer
+  #                        format: int64
+  #                        example: 123
+  #                      name:
+  #                        type: string
+  #                        example: "Name"
+  #                        minLength: 2
+  #                        maxLength: 50
+  #                      surname:
+  #                        type: string
+  #                        example: "Surname"
+  #                        minLength: 2
+  #                        maxLength: 50
+  #                      email:
+  #                        type: string
+  #                        example: "name.surname@email.com"
+  #                      status:
+  #                        type: string
+  #                        enum:
+  #                          - NEEDS_INFORMATION
+  #                          - ACTIVE
+  #                      role:
+  #                        type: string
+  #                        enum:
+  #                          - MENTOR
+  #                          - MENTEE
+  #        '404':
+  #          description: An error of not found user
+  #          content:
+  #            application/json:
+  #              schema:
+  #                type: object
+  #                properties:
+  #                  message:
+  #                    type: string
+  #                    example: 'Не вдається знайти даного користувача.'
+  #        '500':
+  #          description: An internal server error
+  #          content:
+  #            application/json:
+  #              schema:
+  #                type: object
+  #                properties:
+  #                  message:
+  #                    type: string
+  #                    example: 'Internal Server Error'
 
   /api/v1/ranks:
     get:

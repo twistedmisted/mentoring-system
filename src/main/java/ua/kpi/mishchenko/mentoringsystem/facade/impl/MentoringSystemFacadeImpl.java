@@ -18,6 +18,8 @@ import ua.kpi.mishchenko.mentoringsystem.service.S3Service;
 import ua.kpi.mishchenko.mentoringsystem.service.UserService;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 import static java.util.Objects.isNull;
 import static ua.kpi.mishchenko.mentoringsystem.service.impl.S3ServiceImpl.PROFILE_PHOTO;
@@ -26,6 +28,8 @@ import static ua.kpi.mishchenko.mentoringsystem.service.impl.S3ServiceImpl.PROFI
 @RequiredArgsConstructor
 @Slf4j
 public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
+
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
 
     private final UserService userService;
     private final S3Service s3Service;
@@ -53,6 +57,7 @@ public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
                 .email(userDTO.getEmail())
                 .role(userDTO.getRole())
                 .status(userDTO.getStatus())
+                .createdAt(DATE_FORMAT.format(userDTO.getCreatedAt()))
                 .questionnaire(userDTO.getQuestionnaire())
                 .profilePhotoUrl(profilePhotoUrl)
                 .build();

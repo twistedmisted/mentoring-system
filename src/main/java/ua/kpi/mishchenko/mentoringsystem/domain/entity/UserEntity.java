@@ -14,6 +14,8 @@ import lombok.Getter;
 import lombok.Setter;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.UserStatus;
 
+import java.sql.Timestamp;
+
 import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
@@ -42,6 +44,9 @@ public class UserEntity {
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private UserStatus status;
+
+    @Column(name = "created_at", nullable = false)
+    private Timestamp createdAt;
 
     @OneToOne
     @JoinColumn(name = "role_id", nullable = false)

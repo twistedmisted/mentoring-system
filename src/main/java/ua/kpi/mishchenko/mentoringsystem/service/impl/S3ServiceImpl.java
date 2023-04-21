@@ -50,8 +50,8 @@ public class S3ServiceImpl implements S3Service {
     public String getUserPhoto(Long userId) {
         List<String> keys = findAllKeysByPrefix(USERS_FOLDER + SLASH + userId + SLASH);
         if (keys.isEmpty()) {
-            log.warn("Cannot find user photo for user with id = [{}]", userId);
-            throw new IllegalArgumentException("Cannot find user photo for user with id = [" + userId + "]");
+            log.info("Cannot find user photo for user with id = [{}]", userId);
+            return null;
         }
         String key = keys.get(0);
         return s3Client.getAmazonS3().getUrl(BUCKET_NAME, key).toString();

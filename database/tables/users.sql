@@ -1,12 +1,13 @@
 CREATE TABLE users
 (
-    id       BIGINT GENERATED ALWAYS AS IDENTITY,
-    name     VARCHAR(50)  NOT NULL,
-    surname  VARCHAR(50)  NOT NULL,
-    email    VARCHAR(255) NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    status   VARCHAR(256) NOT NULL DEFAULT 'NEEDS_INFORMATION',
-    role_id  INT
+    id        BIGINT GENERATED ALWAYS AS IDENTITY,
+    name      VARCHAR(50)  NOT NULL,
+    surname   VARCHAR(50)  NOT NULL,
+    email     VARCHAR(255) NOT NULL,
+    password  VARCHAR(255) NOT NULL,
+    status    VARCHAR(256) NOT NULL DEFAULT 'NEEDS_INFORMATION',
+    role_id   INT,
+    created_at TIMESTAMP    NOT NULL DEFAULT now()
 );
 
 ALTER TABLE users

@@ -13,4 +13,5 @@ public class UserFilter {
     private Double hoursPerWeek;
     private String rank;
     private UserStatus status;
+    private String role;
 }
