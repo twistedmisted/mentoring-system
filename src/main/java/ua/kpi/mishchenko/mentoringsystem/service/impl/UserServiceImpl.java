@@ -6,7 +6,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.QuestionnaireDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.UserDTO;
@@ -36,6 +35,7 @@ import static ua.kpi.mishchenko.mentoringsystem.domain.entity.specification.User
 import static ua.kpi.mishchenko.mentoringsystem.domain.entity.specification.UserSpecification.matchSpecialization;
 import static ua.kpi.mishchenko.mentoringsystem.domain.entity.specification.UserSpecification.matchStatus;
 import static ua.kpi.mishchenko.mentoringsystem.domain.util.UserStatus.ACTIVE;
+import static ua.kpi.mishchenko.mentoringsystem.util.Util.lessThanOne;
 
 @Service
 @RequiredArgsConstructor
@@ -92,12 +92,8 @@ public class UserServiceImpl implements UserService {
         return new PageBO<>(userDtos, numberOfPage, userPage.getTotalPages());
     }
 
-    private boolean lessThanOne(int numberOfPage) {
-        return numberOfPage < 1;
-    }
-
     @Override
-    @Transactional
+//    @Transactional
     public void updateUserById(Long userId, UserDTO userDTO) {
         log.debug("Updating user information by id = [{}]", userId);
         if (!existsById(userId)) {
@@ -105,8 +101,33 @@ public class UserServiceImpl implements UserService {
             throw new ResponseStatusException(NOT_FOUND, "Не вдається знайти такого користувача.");
         }
         UserEntity userEntity = userRepository.findById(userId).get();
+        String oldEmail = userEntity.getEmail();
         updateUserInformation(userDTO, userEntity);
+        boolean credentialsWereChanged = updateCredentialsIfChanged(userDTO, userEntity);
         userRepository.save(userEntity);
+        if (credentialsWereChanged) {
+            jwtTokenService.invalidateTokenByUserEmail(oldEmail);
+        }
+    }
+
+    private boolean updateCredentialsIfChanged(UserDTO userDTO, UserEntity userEntity) {
+        boolean credentialsWereChanged = false;
+        if (valueExists(userDTO.getPassword())) {
+//            jwtTokenService.invalidateTokenByUserEmail(userEntity.getEmail());
+            userEntity.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+            credentialsWereChanged = true;
+        }
+        if (valueExists(userDTO.getEmail())
+                && valuesNotEqual(userEntity.getEmail(), userDTO.getEmail())) {
+            if (existsByEmail(userDTO.getEmail())) {
+                log.debug("The user with such email already exists");
+                throw new ResponseStatusException(BAD_REQUEST, "Дані не було оновлено. Користувач з такою поштою вже існує.");
+            }
+//            jwtTokenService.invalidateTokenByUserEmail(userEntity.getEmail());
+            userEntity.setEmail(userDTO.getEmail());
+            credentialsWereChanged = true;
+        }
+        return credentialsWereChanged;
     }
 
     private boolean existsById(Long userId) {
@@ -119,14 +140,6 @@ public class UserServiceImpl implements UserService {
         }
         if (valueExists(userDTO.getSurname())) {
             userEntity.setSurname(userDTO.getSurname());
-        }
-        if (valueExists(userDTO.getPassword())) {
-            jwtTokenService.invalidateTokenByUserEmail(userEntity.getEmail());
-            userEntity.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        }
-        if (valueExists(userDTO.getEmail()) && valuesNotEqual(userEntity.getEmail(), userDTO.getEmail())) {
-            jwtTokenService.invalidateTokenByUserEmail(userEntity.getEmail());
-            userEntity.setEmail(userDTO.getEmail());
         }
         QuestionnaireDTO questionnaire = userDTO.getQuestionnaire();
         if (valueExists(questionnaire)) {
@@ -159,6 +172,10 @@ public class UserServiceImpl implements UserService {
             }
             userEntity.setStatus(ACTIVE);
         }
+    }
+
+    private boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
     }
 
     private boolean valuesNotEqual(String oldEmail, String newEmail) {

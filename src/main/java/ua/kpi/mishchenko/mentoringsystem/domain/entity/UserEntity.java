@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
@@ -15,8 +16,11 @@ import lombok.Setter;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.UserStatus;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 import static jakarta.persistence.CascadeType.ALL;
+import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -55,4 +59,10 @@ public class UserEntity {
     @OneToOne(mappedBy = "user", cascade = ALL)
     @PrimaryKeyJoinColumn
     private QuestionnaireEntity questionnaire;
+
+    @OneToMany(mappedBy = "from", fetch = LAZY)
+    private List<MentoringRequestEntity> requestsFrom = new ArrayList<>();
+
+    @OneToMany(mappedBy = "to", fetch = LAZY)
+    private List<MentoringRequestEntity> requestsTo = new ArrayList<>();
 }

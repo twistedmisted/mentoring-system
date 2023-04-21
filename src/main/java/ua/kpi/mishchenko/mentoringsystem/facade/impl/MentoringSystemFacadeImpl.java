@@ -1,37 +1,41 @@
 package ua.kpi.mishchenko.mentoringsystem.facade.impl;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.MediaDTO;
+import ua.kpi.mishchenko.mentoringsystem.domain.dto.MentoringRequestDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.UserDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.mapper.impl.UserMapper;
+import ua.kpi.mishchenko.mentoringsystem.domain.payload.MentoringRequestBO;
+import ua.kpi.mishchenko.mentoringsystem.domain.payload.MentoringRequestResponse;
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.PageBO;
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.UserWithPassword;
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.UserWithPhoto;
+import ua.kpi.mishchenko.mentoringsystem.domain.util.MentoringRequestFilter;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.PhotoExtension;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.UserFilter;
 import ua.kpi.mishchenko.mentoringsystem.exception.IllegalPhotoExtensionException;
 import ua.kpi.mishchenko.mentoringsystem.facade.MentoringSystemFacade;
+import ua.kpi.mishchenko.mentoringsystem.service.MentoringRequestService;
 import ua.kpi.mishchenko.mentoringsystem.service.S3Service;
 import ua.kpi.mishchenko.mentoringsystem.service.UserService;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 
 import static java.util.Objects.isNull;
 import static ua.kpi.mishchenko.mentoringsystem.service.impl.S3ServiceImpl.PROFILE_PHOTO;
+import static ua.kpi.mishchenko.mentoringsystem.util.Util.parseTimestampToStringDate;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
 
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
-
     private final UserService userService;
+    private final MentoringRequestService mentoringRequestService;
     private final S3Service s3Service;
     private final UserMapper userMapper;
 
@@ -57,7 +61,7 @@ public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
                 .email(userDTO.getEmail())
                 .role(userDTO.getRole())
                 .status(userDTO.getStatus())
-                .createdAt(DATE_FORMAT.format(userDTO.getCreatedAt()))
+                .createdAt(parseTimestampToStringDate(userDTO.getCreatedAt()))
                 .questionnaire(userDTO.getQuestionnaire())
                 .profilePhotoUrl(profilePhotoUrl)
                 .build();
@@ -110,5 +114,37 @@ public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
             userWithPhotoPage.addElement(createUserWithPhoto(userDTO, profilePhotoUrl));
         }
         return userWithPhotoPage;
+    }
+
+    @Override
+    public PageBO<MentoringRequestResponse> getMentoringRequests(MentoringRequestFilter filter, int numberOfPage) {
+        PageBO<MentoringRequestDTO> mentoringReqPage = mentoringRequestService.getMentoringRequests(filter, numberOfPage);
+        PageBO<MentoringRequestResponse> mentoringReqResult = new PageBO<>(mentoringReqPage.getCurrentPageNumber(),
+                mentoringReqPage.getTotalPages());
+        for (MentoringRequestDTO mentoringReqDto : mentoringReqPage.getContent()) {
+            String fromPhotoUrl = getProfilePhotoUrlByUserId(mentoringReqDto.getFrom().getId());
+            String toPhotoUrl = getProfilePhotoUrlByUserId(mentoringReqDto.getTo().getId());
+            mentoringReqResult.addElement(createMentoringReqResponse(mentoringReqDto, fromPhotoUrl, toPhotoUrl));
+        }
+        return mentoringReqResult;
+    }
+
+    private MentoringRequestResponse createMentoringReqResponse(MentoringRequestDTO mentoringReqDto, String fromPhotoUrl, String toPhotoUrl) {
+        return MentoringRequestResponse.builder()
+                .id(mentoringReqDto.getId())
+                .from(createUserWithPhoto(mentoringReqDto.getFrom(), fromPhotoUrl))
+                .to(createUserWithPhoto(mentoringReqDto.getTo(), toPhotoUrl))
+                .status(mentoringReqDto.getStatus())
+                .createdAt(parseTimestampToStringDate(mentoringReqDto.getCreatedAt()))
+                .updatedAt(parseTimestampToStringDate(mentoringReqDto.getUpdatedAt()))
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public void createMentoringRequest(String fromEmail, MentoringRequestBO mentoringRequest) {
+        log.debug("Creating new mentoring request");
+        mentoringRequestService.createMentoringRequest(fromEmail, mentoringRequest);
+        // TODO: send push notification
     }
 }
