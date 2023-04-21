@@ -17,6 +17,7 @@ public class UserWithPhoto {
     private String surname;
     private String email;
     private UserStatus status;
+    private String createdAt;
     private String role;
 
     @JsonInclude(NON_NULL)

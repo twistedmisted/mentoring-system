@@ -8,6 +8,8 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
   datasource:
     url: jdbc:postgresql://dpg-cgum5aqut4mdujvups20-a.frankfurt-postgres.render.com/mentoring_system_ud3e
     username: tw_admin

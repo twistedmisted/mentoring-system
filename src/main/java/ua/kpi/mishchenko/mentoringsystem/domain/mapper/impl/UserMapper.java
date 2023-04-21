@@ -32,6 +32,7 @@ public class UserMapper implements Mapper<UserEntity, UserDTO> {
         entity.setEmail(dto.getEmail());
         entity.setPassword(dto.getPassword());
         entity.setStatus(dto.getStatus());
+        entity.setCreatedAt(dto.getCreatedAt());
         entity.setRole(roleRepository.findByName(dto.getRole()).get());
         entity.setQuestionnaire(questionnaireMapper.dtoToEntity(dto.getQuestionnaire()));
         return entity;
@@ -49,6 +50,7 @@ public class UserMapper implements Mapper<UserEntity, UserDTO> {
         dto.setEmail(entity.getEmail());
         dto.setPassword(entity.getPassword());
         dto.setStatus(entity.getStatus());
+        dto.setCreatedAt(entity.getCreatedAt());
         dto.setRole(entity.getRole().getName());
         dto.setQuestionnaire(questionnaireMapper.entityToDto(entity.getQuestionnaire()));
         return dto;
@@ -79,7 +81,7 @@ public class UserMapper implements Mapper<UserEntity, UserDTO> {
     }
 
     public UserDTO userWithPasswordToDto(UserWithPassword user) {
-        if(isNull(user)) {
+        if (isNull(user)) {
             return null;
         }
         UserDTO dto = new UserDTO();

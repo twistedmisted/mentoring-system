@@ -14,6 +14,7 @@ import static java.util.Objects.isNull;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static ua.kpi.mishchenko.mentoringsystem.domain.util.UserStatus.NEEDS_INFORMATION;
+import static ua.kpi.mishchenko.mentoringsystem.util.Util.getTimestampNow;
 
 @Service
 @RequiredArgsConstructor
@@ -50,6 +51,7 @@ public class RegistrationService {
         entity.setRole(roleRepository.findByName(userToSave.getRole())
                 .orElseThrow(() -> new ResponseStatusException(INTERNAL_SERVER_ERROR, "Схоже, що ми маємо деякі проблеми під час реєстрації. Зачекайте, можливо ми вже вирішуємо це.")));
         entity.setStatus(NEEDS_INFORMATION);
+        entity.setCreatedAt(getTimestampNow());
         return entity;
     }
 }

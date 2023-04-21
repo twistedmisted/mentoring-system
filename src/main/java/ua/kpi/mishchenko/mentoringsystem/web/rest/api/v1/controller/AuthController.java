@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.AuthenticationRequest;
-import ua.kpi.mishchenko.mentoringsystem.domain.payload.AuthenticationResponse;
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.RegistrationRequest;
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.RestorePasswordRequest;
+import ua.kpi.mishchenko.mentoringsystem.service.UserService;
 import ua.kpi.mishchenko.mentoringsystem.service.security.JwtTokenService;
 import ua.kpi.mishchenko.mentoringsystem.service.security.RegistrationService;
 import ua.kpi.mishchenko.mentoringsystem.service.security.RestorePasswordService;
@@ -39,9 +39,10 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenService jwtTokenService;
     private final RestorePasswordService restorePasswordService;
+    private final UserService userService;
 
     @PostMapping(value = "/login", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<AuthenticationResponse> authenticateUser(@RequestBody @Valid final AuthenticationRequest authenticationRequest) {
+    public ResponseEntity<Map<String, Object>> authenticateUser(@RequestBody @Valid final AuthenticationRequest authenticationRequest) {
         Authentication authenticate;
         try {
             authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
@@ -49,9 +50,10 @@ public class AuthController {
         } catch (final BadCredentialsException ex) {
             throw new ResponseStatusException(UNAUTHORIZED, "Неправильно введено пошту або пароль, первірте правильність вводу.");
         }
-        final AuthenticationResponse authenticationResponse = new AuthenticationResponse();
-        authenticationResponse.setAccessToken(jwtTokenService.generateToken(authenticate));
-        return new ResponseEntity<>(authenticationResponse, OK);
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("accessToken", jwtTokenService.generateToken(authenticate));
+        responseBody.put("userStatus", userService.getUserStatusByEmail(authenticationRequest.getEmail()));
+        return new ResponseEntity<>(responseBody, OK);
     }
 
     @PostMapping(value = "/register", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)

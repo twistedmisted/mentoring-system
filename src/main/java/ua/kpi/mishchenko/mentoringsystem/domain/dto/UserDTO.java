@@ -9,6 +9,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.UserStatus;
 
+import java.sql.Timestamp;
+
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 @Data
@@ -32,6 +34,8 @@ public class UserDTO {
     private String password;
 
     private UserStatus status;
+
+    private Timestamp createdAt;
 
     @NotBlank(message = "Необхідно обрати тип профілю.")
     private String role;
