@@ -17,6 +17,7 @@ import ua.kpi.mishchenko.mentoringsystem.domain.entity.UserEntity;
 import ua.kpi.mishchenko.mentoringsystem.domain.mapper.impl.UserMapper;
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.PageBO;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.UserFilter;
+import ua.kpi.mishchenko.mentoringsystem.domain.util.UserStatus;
 import ua.kpi.mishchenko.mentoringsystem.repository.RankRepository;
 import ua.kpi.mishchenko.mentoringsystem.repository.SpecializationRepository;
 import ua.kpi.mishchenko.mentoringsystem.repository.UserRepository;
@@ -54,6 +55,17 @@ public class UserServiceImpl implements UserService {
         log.debug("Getting user by id = [{}]", userId);
         UserEntity userEntity = userRepository.findById(userId).orElse(null);
         return userMapper.entityToDto(userEntity);
+    }
+
+    @Override
+    public UserStatus getUserStatusByEmail(String email) {
+        log.debug("Getting user status by email = [{}]", email);
+        UserEntity userEntity = userRepository.findByEmail(email).orElse(null);
+        if (isNull(userEntity)) {
+            log.warn("Cannot find user with email = [{}]", email);
+            throw new ResponseStatusException(NOT_FOUND, "Не вдається знайти даного користувача.");
+        }
+        return userEntity.getStatus();
     }
 
     @Override
