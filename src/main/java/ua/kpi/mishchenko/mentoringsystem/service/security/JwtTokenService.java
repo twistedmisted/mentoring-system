@@ -66,4 +66,10 @@ public class JwtTokenService {
         List<JwtTokenHash> tokens = jwtTokenRepository.findAllByEmail(email);
         jwtTokenRepository.deleteAll(tokens);
     }
+
+    public void invalidateTokenByUserToken(String token) {
+        JwtTokenHash jwtTokenHash = jwtTokenRepository.findByToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("Cannot find jwt token"));
+        jwtTokenRepository.delete(jwtTokenHash);
+    }
 }

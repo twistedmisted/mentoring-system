@@ -10,6 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -24,6 +25,7 @@ import ua.kpi.mishchenko.mentoringsystem.service.security.RestorePasswordService
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
@@ -52,6 +54,13 @@ public class AuthController {
         AuthenticationResponse authenticationResponse = new AuthenticationResponse();
         authenticationResponse.setAccessToken(jwtTokenService.generateToken(authenticate));
         return new ResponseEntity<>(authenticationResponse, OK);
+    }
+
+    @PostMapping("logout")
+    public ResponseEntity<?> logout(@RequestHeader(AUTHORIZATION) String authHeader) {
+        final String token = authHeader.substring(7);
+        jwtTokenService.invalidateTokenByUserToken(token);
+        return new ResponseEntity<>(OK);
     }
 
     @PostMapping(value = "/register", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)

@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -63,6 +64,7 @@ public class UserController {
     }
 
     @GetMapping("/me")
+    @PreAuthorize("hasAnyAuthority('MENTOR', 'MENTEE')")
     public ResponseEntity<Map<String, Object>> getMeStatus(Principal principal) {
         log.debug("Getting status for user with email = [{}]", principal.getName());
         UserWithPhoto user = mentoringSystemFacade.getUserByEmail(principal.getName());

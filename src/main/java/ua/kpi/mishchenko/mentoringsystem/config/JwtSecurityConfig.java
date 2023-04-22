@@ -84,7 +84,12 @@ public class JwtSecurityConfig {
                 .authorizeHttpRequests()
                 .requestMatchers(POST, API_PATH + "/auth/**").permitAll()
                 .requestMatchers(AUTH_WHITELIST).permitAll()
-                .requestMatchers(GET, API_PATH + "/users/{id}", API_PATH + "/users", API_PATH + "/ranks", API_PATH + "/specializations").permitAll()
+                .requestMatchers(GET,
+                        API_PATH + "/users/{id}/**",
+                        API_PATH + "/users/mentors",
+                        API_PATH + "/users/mentees",
+                        API_PATH + "/ranks",
+                        API_PATH + "/specializations").permitAll()
 //                .requestMatchers(POST, API_PATH + "/recipes").hasRole(USER)
                 .anyRequest().hasAnyAuthority(MENTEE_ROLE, MENTOR_ROLE).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()

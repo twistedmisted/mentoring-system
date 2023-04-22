@@ -13,6 +13,6 @@ public class AuthenticationRequest {
     private String email;
 
     @NotBlank(message = "Необіхдно ввести пароль.")
-    @Size(min = 10, max = 20, message = "Пароль введено некоректно.")
+    @Size(min = 8, max = 20, message = "Пароль введено некоректно.")
     private String password;
 }

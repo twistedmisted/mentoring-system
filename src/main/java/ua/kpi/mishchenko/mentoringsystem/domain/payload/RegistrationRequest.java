@@ -21,7 +21,7 @@ public class RegistrationRequest {
     private String email;
 
     @NotBlank(message = "Необхідно ввести пароль.")
-    @Size(min = 10, max = 20, message = "Пароль має бути від 10 до 20 символів.")
+    @Size(min = 8, max = 20, message = "Пароль має бути від 8 до 20 символів.")
     private String password;
 
     @NotBlank(message = "Необхідно обрати тип профілю.")

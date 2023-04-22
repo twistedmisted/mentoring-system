@@ -6,6 +6,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -15,6 +16,9 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 @ControllerAdvice
 public class ValidationHandler extends ResponseEntityExceptionHandler {
@@ -46,11 +50,18 @@ public class ValidationHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(value = {AccessDeniedException.class})
+    public ResponseEntity<Map<String, Object>> handleAccessDeniedException(AccessDeniedException ex) {
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put(KEY_DETAIL, "Необхідно авторизуватися, щоб отримати цю інформацію.");
+        return new ResponseEntity<>(responseBody, FORBIDDEN);
+    }
+
     @ExceptionHandler(value = {RuntimeException.class})
     public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex) {
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put(KEY_DETAIL, "Схоже ми маємо деякі проблеми. Спробуйте відправити запит повторно або зачекати. Можливо ми вже вирішуємо цю проблему.");
-        return new ResponseEntity<>(responseBody, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(responseBody, INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(value = {IllegalArgumentException.class, IllegalStateException.class})
