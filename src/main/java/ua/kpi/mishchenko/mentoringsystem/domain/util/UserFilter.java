@@ -8,8 +8,9 @@ import lombok.Data;
 public class UserFilter {
 
     private String specialization;
-    private Double hoursPerWeek;
     private String rank;
     private UserStatus status;
     private String role;
+    private Double minHours;
+    private Double maxHours;
 }

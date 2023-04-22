@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -28,7 +29,8 @@ import static java.util.Objects.isNull;
 import static org.springframework.data.jpa.domain.Specification.where;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static ua.kpi.mishchenko.mentoringsystem.domain.entity.specification.UserSpecification.matchHoursPerWeek;
+import static ua.kpi.mishchenko.mentoringsystem.domain.entity.specification.UserSpecification.hoursGreaterThanMinValue;
+import static ua.kpi.mishchenko.mentoringsystem.domain.entity.specification.UserSpecification.hoursLessThanMaxValue;
 import static ua.kpi.mishchenko.mentoringsystem.domain.entity.specification.UserSpecification.matchRank;
 import static ua.kpi.mishchenko.mentoringsystem.domain.entity.specification.UserSpecification.matchRole;
 import static ua.kpi.mishchenko.mentoringsystem.domain.entity.specification.UserSpecification.matchSpecialization;
@@ -73,11 +75,7 @@ public class UserServiceImpl implements UserService {
             log.warn("The number of page and size of page must be greater than zero");
             throw new ResponseStatusException(BAD_REQUEST, "Номер сторінки не може бути менше 1.");
         }
-        Page<UserEntity> userPage = userRepository.findAll(where(matchSpecialization(userFilter.getSpecialization()))
-                .and(matchRank(userFilter.getRank()))
-                .and(matchHoursPerWeek(userFilter.getHoursPerWeek()))
-                .and(matchStatus(userFilter.getStatus()))
-                .and(matchRole(userFilter.getRole())), PageRequest.of(numberOfPage - 1, PAGE_SIZE));
+        Page<UserEntity> userPage = userRepository.findAll(createSpecification(userFilter), PageRequest.of(numberOfPage - 1, PAGE_SIZE));
         if (!userPage.hasContent()) {
             log.debug("Cannot find users with this filter parameters");
             return new PageBO<>(numberOfPage, userPage.getTotalPages());
@@ -87,6 +85,16 @@ public class UserServiceImpl implements UserService {
                 .map(userMapper::entityToDto)
                 .toList();
         return new PageBO<>(userDtos, numberOfPage, userPage.getTotalPages());
+    }
+
+    private Specification<UserEntity> createSpecification(UserFilter userFilter) {
+        return where(matchSpecialization(userFilter.getSpecialization()))
+                .and(matchRank(userFilter.getRank()))
+//                .and(matchHoursPerWeek(userFilter.getHoursPerWeek()))
+                .and(matchStatus(userFilter.getStatus()))
+                .and(matchRole(userFilter.getRole()))
+                .and(hoursLessThanMaxValue(userFilter.getMaxHours()))
+                .and(hoursGreaterThanMinValue(userFilter.getMinHours()));
     }
 
     @Override

@@ -80,9 +80,9 @@ public class UserController {
         Map<String, Object> responseBody = getUsersByFilter(UserFilter.builder()
                 .specialization(specialization)
                 .rank(rank)
-                .hoursPerWeek(hoursPerWeek)
                 .status(ACTIVE)
                 .role(MENTOR_ROLE)
+                .minHours(hoursPerWeek)
                 .build(), numberOfPage);
         return new ResponseEntity<>(responseBody, OK);
     }
@@ -95,9 +95,9 @@ public class UserController {
         Map<String, Object> responseBody = getUsersByFilter(UserFilter.builder()
                 .specialization(specialization)
                 .rank(rank)
-                .hoursPerWeek(hoursPerWeek)
                 .status(ACTIVE)
                 .role(MENTEE_ROLE)
+                .maxHours(hoursPerWeek)
                 .build(), numberOfPage);
         return new ResponseEntity<>(responseBody, OK);
     }

@@ -42,4 +42,20 @@ public class UserSpecification {
         }
         return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("role").get("name"), role);
     }
+
+    public static Specification<UserEntity> hoursLessThanMaxValue(Double hours) {
+        if (isNull(hours) || hours <= 0) {
+            return null;
+        }
+        return (root, query, criteriaBuilder) -> criteriaBuilder.lessThanOrEqualTo(root.get("questionnaire")
+                .get("hoursPerWeek"), hours);
+    }
+
+    public static Specification<UserEntity> hoursGreaterThanMinValue(Double hours) {
+        if (isNull(hours) || hours <= 0) {
+            return null;
+        }
+        return (root, query, criteriaBuilder) -> criteriaBuilder.greaterThanOrEqualTo(root.get("questionnaire")
+                .get("hoursPerWeek"), hours);
+    }
 }
