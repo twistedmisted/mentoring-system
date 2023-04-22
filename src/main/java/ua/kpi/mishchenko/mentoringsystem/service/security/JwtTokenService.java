@@ -7,12 +7,15 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import ua.kpi.mishchenko.mentoringsystem.domain.redis.hash.JwtTokenHash;
 import ua.kpi.mishchenko.mentoringsystem.repository.redis.JwtTokenRepository;
 import ua.kpi.mishchenko.mentoringsystem.util.Util;
 
 import java.util.Date;
 import java.util.List;
+
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 @Service
 public class JwtTokenService {
@@ -69,7 +72,7 @@ public class JwtTokenService {
 
     public void invalidateTokenByUserToken(String token) {
         JwtTokenHash jwtTokenHash = jwtTokenRepository.findByToken(token)
-                .orElseThrow(() -> new IllegalArgumentException("Cannot find jwt token"));
+                .orElseThrow(() -> new ResponseStatusException(INTERNAL_SERVER_ERROR, "Не вдалося розлогінити користувача."));
         jwtTokenRepository.delete(jwtTokenHash);
     }
 }

@@ -84,6 +84,39 @@ paths:
                   instance:
                     type: string
                     example: "/api/v1/auth/login"
+  /api/v1/auth/logout:
+    post:
+      tags:
+        - Authorization
+      summary: User logout
+      responses:
+        '204':
+          description: User was successfully logout
+        '500':
+          description: Cannot find token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: "about:blank"
+                  title:
+                    type: string
+                    example: "Bad Request"
+                  status:
+                    type: integer
+                    format: int32
+                    example: 400
+                  detail:
+                    type: string
+                    example: "Не вдалося розлогінити користувача."
+                  instance:
+                    type: string
+                    example: "/api/v1/auth/logout"
+      security:
+        - jwt_token: [ ]
   /api/v1/auth/register:
     post:
       tags:
