@@ -25,4 +25,10 @@ public interface MentoringSystemFacade {
     PageBO<MentoringRequestResponse> getMentoringRequests(MentoringRequestFilter filter, int numberOfPage);
 
     void createMentoringRequest(String fromEmail, MentoringRequestBO mentoringRequest);
+
+    void acceptMentoringReq(Long reqId, String email);
+
+    void rejectMentoringReq(Long reqId, String email);
+
+    void cancelMentoringReq(Long reqId, String email);
 }

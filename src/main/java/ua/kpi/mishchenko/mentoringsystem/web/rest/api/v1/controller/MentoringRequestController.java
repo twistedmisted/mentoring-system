@@ -5,7 +5,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,6 +27,7 @@ import java.util.Map;
 import static java.util.Objects.isNull;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 @RestController
@@ -93,5 +96,29 @@ public class MentoringRequestController {
         log.debug("Creating new mentoring request");
         mentoringSystemFacade.createMentoringRequest(principal.getName(), mentoringRequest);
         return new ResponseEntity<>(CREATED);
+    }
+
+    @PutMapping("/accept/{reqId}")
+    public ResponseEntity<Map<String, Object>> acceptMentoringRequest(@PathVariable Long reqId,
+                                                                      Principal principal) {
+        log.debug("Approving mentoring request by id = [{}]", reqId);
+        mentoringSystemFacade.acceptMentoringReq(reqId, principal.getName());
+        return new ResponseEntity<>(NO_CONTENT);
+    }
+
+    @PutMapping("/reject/{reqId}")
+    public ResponseEntity<Map<String, Object>> rejectMentoringRequest(@PathVariable Long reqId,
+                                                                      Principal principal) {
+        log.debug("Rejecting mentoring request by id = [{}]", reqId);
+        mentoringSystemFacade.rejectMentoringReq(reqId, principal.getName());
+        return new ResponseEntity<>(NO_CONTENT);
+    }
+
+    @PutMapping("/cancel/{reqId}")
+    public ResponseEntity<Map<String, Object>> cancelMentoringRequest(@PathVariable Long reqId,
+                                                                      Principal principal) {
+        log.debug("Canceling mentoring request by id = [{}]", reqId);
+        mentoringSystemFacade.cancelMentoringReq(reqId, principal.getName());
+        return new ResponseEntity<>(NO_CONTENT);
     }
 }

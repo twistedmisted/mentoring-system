@@ -13,6 +13,7 @@ import ua.kpi.mishchenko.mentoringsystem.domain.mapper.impl.MentoringRequestMapp
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.MentoringRequestBO;
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.PageBO;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.MentoringRequestFilter;
+import ua.kpi.mishchenko.mentoringsystem.domain.util.MentoringRequestStatus;
 import ua.kpi.mishchenko.mentoringsystem.repository.MentoringRequestRepository;
 import ua.kpi.mishchenko.mentoringsystem.repository.UserRepository;
 import ua.kpi.mishchenko.mentoringsystem.service.MentoringRequestService;
@@ -22,10 +23,15 @@ import java.util.List;
 import static java.util.Objects.isNull;
 import static org.springframework.data.jpa.domain.Specification.where;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static ua.kpi.mishchenko.mentoringsystem.domain.entity.specification.MentoringRequestSpecification.matchFromEmail;
 import static ua.kpi.mishchenko.mentoringsystem.domain.entity.specification.MentoringRequestSpecification.matchStatus;
 import static ua.kpi.mishchenko.mentoringsystem.domain.entity.specification.MentoringRequestSpecification.matchToEmail;
+import static ua.kpi.mishchenko.mentoringsystem.domain.util.MentoringRequestStatus.ACCEPTED;
+import static ua.kpi.mishchenko.mentoringsystem.domain.util.MentoringRequestStatus.CANCELED;
 import static ua.kpi.mishchenko.mentoringsystem.domain.util.MentoringRequestStatus.PENDING;
+import static ua.kpi.mishchenko.mentoringsystem.domain.util.MentoringRequestStatus.REJECTED;
 import static ua.kpi.mishchenko.mentoringsystem.domain.util.UserStatus.ACTIVE;
 import static ua.kpi.mishchenko.mentoringsystem.util.Util.getTimestampNow;
 import static ua.kpi.mishchenko.mentoringsystem.util.Util.lessThanOne;
@@ -113,5 +119,93 @@ public class MentoringRequestServiceImpl implements MentoringRequestService {
         entity.setCreatedAt(getTimestampNow());
         entity.setUpdatedAt(getTimestampNow());
         return entity;
+    }
+
+    @Override
+    public void acceptMentoringReqStatusById(Long reqId, String email) {
+        log.debug("Accepting mentoring request by id = [{}]", reqId);
+        MentoringRequestEntity mentoringReqEntity = getMentoringRequestEntityById(reqId);
+        final MentoringRequestStatus oldStatus = mentoringReqEntity.getStatus();
+        final MentoringRequestStatus newStatus = ACCEPTED;
+        if (isPending(oldStatus) && statusesNotEquals(oldStatus, newStatus)) {
+            if (checkIfUserHasRights(email, mentoringReqEntity.getTo().getEmail())) {
+                updateMentoringRequestStatus(mentoringReqEntity, newStatus);
+                return;
+            }
+            logAndThrowForbiddenException("Схоже Ви не маєте прав, щоб прийняти цей запит.");
+        }
+        logAndThrowProcessedReqException();
+    }
+
+    @Override
+    public void rejectMentoringReqStatusById(Long reqId, String email) {
+        log.debug("Rejecting mentoring request by id = [{}]", reqId);
+        MentoringRequestEntity mentoringReqEntity = getMentoringRequestEntityById(reqId);
+        final MentoringRequestStatus oldStatus = mentoringReqEntity.getStatus();
+        final MentoringRequestStatus newStatus = REJECTED;
+        if (isPending(oldStatus) && statusesNotEquals(oldStatus, newStatus)) {
+            if (checkIfUserHasRights(email, mentoringReqEntity.getTo().getEmail())) {
+                updateMentoringRequestStatus(mentoringReqEntity, newStatus);
+                return;
+            }
+            logAndThrowForbiddenException("Схоже Ви не маєте прав, щоб відхилити цей запит.");
+        }
+        logAndThrowProcessedReqException();
+    }
+
+    @Override
+    public void cancelMentoringReqStatusById(Long reqId, String email) {
+        log.debug("Canceling mentoring request by id = [{}]", reqId);
+        MentoringRequestEntity mentoringReqEntity = getMentoringRequestEntityById(reqId);
+        final MentoringRequestStatus oldStatus = mentoringReqEntity.getStatus();
+        final MentoringRequestStatus newStatus = CANCELED;
+        if (isPending(oldStatus) && statusesNotEquals(oldStatus, newStatus)) {
+            if (checkIfUserHasRights(email, mentoringReqEntity.getFrom().getEmail())) {
+                updateMentoringRequestStatus(mentoringReqEntity, newStatus);
+                return;
+            }
+            logAndThrowForbiddenException("Схоже Ви не маєте прав, щоб відмінити цей запит.");
+        }
+        logAndThrowProcessedReqException();
+    }
+
+    private MentoringRequestEntity getMentoringRequestEntityById(Long reqId) {
+        if (!existsById(reqId)) {
+            log.warn("The mentoring request with id = [{}] does not exist", reqId);
+            throw new ResponseStatusException(NOT_FOUND, "Не вдається знайти запит, схоже його не існує.");
+        }
+        return mentoringRequestRepository.findById(reqId)
+                .orElseThrow(() -> new IllegalArgumentException("Cannot find mentoring request by id = [" + reqId + "]"));
+    }
+
+    private boolean existsById(Long reqId) {
+        return mentoringRequestRepository.existsById(reqId);
+    }
+
+    private boolean isPending(MentoringRequestStatus oldStatus) {
+        return PENDING.equals(oldStatus);
+    }
+
+    private boolean statusesNotEquals(MentoringRequestStatus status1, MentoringRequestStatus status2) {
+        return !status1.equals(status2);
+    }
+
+    private boolean checkIfUserHasRights(String authEmail, String reqEmail) {
+        return authEmail.equals(reqEmail);
+    }
+
+    private void updateMentoringRequestStatus(MentoringRequestEntity mentoringReqEntity, MentoringRequestStatus newStatus) {
+        mentoringReqEntity.setStatus(newStatus);
+        mentoringRequestRepository.save(mentoringReqEntity);
+    }
+
+    private void logAndThrowForbiddenException(String exMessage) {
+        log.debug("The user has not right to change status");
+        throw new ResponseStatusException(FORBIDDEN, exMessage);
+    }
+
+    private void logAndThrowProcessedReqException() {
+        log.debug("The mentoring request can't change status from Accepted or Rejected");
+        throw new ResponseStatusException(BAD_REQUEST, "Запит уже був опрацьований.");
     }
 }

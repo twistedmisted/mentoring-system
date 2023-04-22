@@ -1092,6 +1092,258 @@ paths:
                     example: "/api/v1/mentoring-requests"
       security:
         - jwt_token: [ ]
+  /api/v1/mentoring-requests/accept/{reqId}:
+    put:
+      tags:
+        - MentoringRequest
+      summary: Updates a mentoring request status to ACCEPTED
+      parameters:
+        - in: path
+          name: reqId
+          required: true
+          example: 1
+      responses:
+        '204':
+          description: A mentoring request status was successfully updated
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: "about:blank"
+                  title:
+                    type: string
+                    example: "Bad Request"
+                  status:
+                    type: integer
+                    format: int32
+                    example: 400
+                  detail:
+                    type: string
+                    example: "Запит уже був опрацьований."
+                  instance:
+                    type: string
+                    example: "/api/v1/mentoring-requests/accept/1"
+        '403':
+          description: User is not authorized or has not rights to accept mentoring request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: "about:blank"
+                  title:
+                    type: string
+                    example: "Forbidden"
+                  status:
+                    type: integer
+                    format: int32
+                    example: 403
+                  detail:
+                    type: string
+                    example: "Схоже Ви не маєте прав, щоб прийняти цей запит."
+                  instance:
+                    type: string
+                    example: "/api/v1/mentoring-requests/accept/1"
+        '404':
+          description: Cannot find mentoring request by id
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: "about:blank"
+                  title:
+                    type: string
+                    example: "Not Found"
+                  status:
+                    type: integer
+                    format: int32
+                    example: 404
+                  detail:
+                    type: string
+                    example: "Не вдається знайти запит, схоже його не існує."
+                  instance:
+                    type: string
+                    example: "/api/v1/mentoring-requests/accept/1"
+      security:
+        - jwt_token: [ ]
+  /api/v1/mentoring-requests/reject/{reqId}:
+    put:
+      tags:
+        - MentoringRequest
+      summary: Updates a mentoring request status to REJECTED
+      parameters:
+        - in: path
+          name: reqId
+          required: true
+          example: 1
+      responses:
+        '204':
+          description: A mentoring request status was successfully updated
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: "about:blank"
+                  title:
+                    type: string
+                    example: "Bad Request"
+                  status:
+                    type: integer
+                    format: int32
+                    example: 400
+                  detail:
+                    type: string
+                    example: "Запит уже був опрацьований."
+                  instance:
+                    type: string
+                    example: "/api/v1/mentoring-requests/reject/1"
+        '403':
+          description: User is not authorized or has not rights to reject mentoring request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: "about:blank"
+                  title:
+                    type: string
+                    example: "Forbidden"
+                  status:
+                    type: integer
+                    format: int32
+                    example: 403
+                  detail:
+                    type: string
+                    example: "Схоже Ви не маєте прав, щоб відхилити цей запит."
+                  instance:
+                    type: string
+                    example: "/api/v1/mentoring-requests/reject/1"
+        '404':
+          description: Cannot find mentoring request by id
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: "about:blank"
+                  title:
+                    type: string
+                    example: "Not Found"
+                  status:
+                    type: integer
+                    format: int32
+                    example: 404
+                  detail:
+                    type: string
+                    example: "Не вдається знайти запит, схоже його не існує."
+                  instance:
+                    type: string
+                    example: "/api/v1/mentoring-requests/reject/1"
+      security:
+        - jwt_token: [ ]
+  /api/v1/mentoring-requests/cancel/{reqId}:
+    put:
+      tags:
+        - MentoringRequest
+      summary: Updates a mentoring request status to CANCELED
+      parameters:
+        - in: path
+          name: reqId
+          required: true
+          example: 1
+      responses:
+        '204':
+          description: A mentoring request status was successfully updated
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: "about:blank"
+                  title:
+                    type: string
+                    example: "Bad Request"
+                  status:
+                    type: integer
+                    format: int32
+                    example: 400
+                  detail:
+                    type: string
+                    example: "Запит уже був опрацьований."
+                  instance:
+                    type: string
+                    example: "/api/v1/mentoring-requests/cancel/1"
+        '403':
+          description: User is not authorized or has not rights to cancel mentoring request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: "about:blank"
+                  title:
+                    type: string
+                    example: "Forbidden"
+                  status:
+                    type: integer
+                    format: int32
+                    example: 403
+                  detail:
+                    type: string
+                    example: "Схоже Ви не маєте прав, щоб відмінити цей запит."
+                  instance:
+                    type: string
+                    example: "/api/v1/mentoring-requests/cancel/1"
+        '404':
+          description: Cannot find mentoring request by id
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: "about:blank"
+                  title:
+                    type: string
+                    example: "Not Found"
+                  status:
+                    type: integer
+                    format: int32
+                    example: 404
+                  detail:
+                    type: string
+                    example: "Не вдається знайти запит, схоже його не існує."
+                  instance:
+                    type: string
+                    example: "/api/v1/mentoring-requests/cancel/1"
+      security:
+        - jwt_token: [ ]
 
   /api/v1/ranks:
     get:

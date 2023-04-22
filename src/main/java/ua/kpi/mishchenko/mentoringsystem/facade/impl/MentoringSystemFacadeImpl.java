@@ -147,4 +147,22 @@ public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
         mentoringRequestService.createMentoringRequest(fromEmail, mentoringRequest);
         // TODO: send push notification
     }
+
+    @Override
+    public void acceptMentoringReq(Long reqId, String email) {
+        log.debug("Accepting mentoring request by id = [{}]", reqId);
+        mentoringRequestService.acceptMentoringReqStatusById(reqId, email);
+    }
+
+    @Override
+    public void rejectMentoringReq(Long reqId, String email) {
+        log.debug("Rejecting mentoring request by id = [{}]", reqId);
+        mentoringRequestService.rejectMentoringReqStatusById(reqId, email);
+    }
+
+    @Override
+    public void cancelMentoringReq(Long reqId, String email) {
+        log.debug("Canceling mentoring request by id = [{}]", reqId);
+        mentoringRequestService.cancelMentoringReqStatusById(reqId, email);
+    }
 }
