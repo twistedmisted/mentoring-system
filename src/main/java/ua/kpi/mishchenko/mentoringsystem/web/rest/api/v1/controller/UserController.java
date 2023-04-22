@@ -51,7 +51,7 @@ public class UserController {
         log.debug("Getting user by id = [{}]", userId);
         Map<String, Object> responseBody = new HashMap<>();
         UserWithPhoto user = mentoringSystemFacade.getUserWithPhotoById(userId);
-        if (isNull(user) || checkPermissionForNotActiveUser(principal, user.getEmail(), user.getStatus())) {
+        if (checkPermissionForNotActiveUser(principal, user.getEmail(), user.getStatus())) {
             throw new ResponseStatusException(NOT_FOUND, "Не вдається знайти даного користувача.");
         }
         responseBody.put("user", user);
@@ -62,12 +62,12 @@ public class UserController {
         return (isNull(principal) || !principal.getName().equals(email)) && !status.equals(ACTIVE);
     }
 
-    @GetMapping("/me/status")
+    @GetMapping("/me")
     public ResponseEntity<Map<String, Object>> getMeStatus(Principal principal) {
         log.debug("Getting status for user with email = [{}]", principal.getName());
-        UserStatus meStatus = mentoringSystemFacade.getUserStatusByEmail(principal.getName());
+        UserWithPhoto user = mentoringSystemFacade.getUserByEmail(principal.getName());
         Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("status", meStatus);
+        responseBody.put("user", user);
         return new ResponseEntity<>(responseBody, OK);
     }
 

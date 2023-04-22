@@ -1,7 +1,6 @@
 package ua.kpi.mishchenko.mentoringsystem.facade;
 
 import org.springframework.web.multipart.MultipartFile;
-import ua.kpi.mishchenko.mentoringsystem.domain.dto.UserDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.MentoringRequestBO;
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.MentoringRequestResponse;
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.PageBO;
@@ -9,15 +8,12 @@ import ua.kpi.mishchenko.mentoringsystem.domain.payload.UserWithPassword;
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.UserWithPhoto;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.MentoringRequestFilter;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.UserFilter;
-import ua.kpi.mishchenko.mentoringsystem.domain.util.UserStatus;
 
 public interface MentoringSystemFacade {
 
-    UserDTO getUserById(Long userId);
-
     UserWithPhoto getUserWithPhotoById(Long userId);
 
-    UserStatus getUserStatusByEmail(String email);
+    UserWithPhoto getUserByEmail(String email);
 
     void updateUserById(Long userId, UserWithPassword user, MultipartFile photo);
 

@@ -17,7 +17,6 @@ import ua.kpi.mishchenko.mentoringsystem.domain.payload.UserWithPhoto;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.MentoringRequestFilter;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.PhotoExtension;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.UserFilter;
-import ua.kpi.mishchenko.mentoringsystem.domain.util.UserStatus;
 import ua.kpi.mishchenko.mentoringsystem.exception.IllegalPhotoExtensionException;
 import ua.kpi.mishchenko.mentoringsystem.facade.MentoringSystemFacade;
 import ua.kpi.mishchenko.mentoringsystem.service.MentoringRequestService;
@@ -41,16 +40,18 @@ public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
     private final UserMapper userMapper;
 
     @Override
-    public UserDTO getUserById(Long userId) {
-        log.debug("Getting user by id = [{}]", userId);
-        return userService.getUserById(userId);
-    }
-
-    @Override
     public UserWithPhoto getUserWithPhotoById(Long userId) {
         log.debug("Getting user with photo by id = [{}]", userId);
         UserDTO userDTO = userService.getUserById(userId);
         String profilePhotoUrl = getProfilePhotoUrlByUserId(userId);
+        return createUserWithPhoto(userDTO, profilePhotoUrl);
+    }
+
+    @Override
+    public UserWithPhoto getUserByEmail(String email) {
+        log.debug("Getting user with photo by email = [{}]", email);
+        UserDTO userDTO = userService.getUserByEmail(email);
+        String profilePhotoUrl = getProfilePhotoUrlByUserId(userDTO.getId());
         return createUserWithPhoto(userDTO, profilePhotoUrl);
     }
 
@@ -70,12 +71,6 @@ public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
 
     private String getProfilePhotoUrlByUserId(Long userId) {
         return s3Service.getUserPhoto(userId);
-    }
-
-    @Override
-    public UserStatus getUserStatusByEmail(String email) {
-        log.debug("Getting user status by email = [{}]", email);
-        return userService.getUserStatusByEmail(email);
     }
 
     @Override
