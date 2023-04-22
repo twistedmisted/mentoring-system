@@ -24,7 +24,6 @@ import ua.kpi.mishchenko.mentoringsystem.facade.MentoringSystemFacade;
 
 import java.security.Principal;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static java.util.Objects.isNull;
@@ -74,12 +73,12 @@ public class UserController {
     }
 
     @GetMapping("/mentors")
-    public ResponseEntity<Map<String, Object>> getActiveMentors(@RequestParam(required = false) List<String> specializations,
+    public ResponseEntity<Map<String, Object>> getActiveMentors(@RequestParam(required = false) String specialization,
                                                                 @RequestParam(required = false) Double hoursPerWeek,
                                                                 @RequestParam(required = false) String rank,
                                                                 @RequestParam(value = "page", required = false, defaultValue = "1") int numberOfPage) {
         Map<String, Object> responseBody = getUsersByFilter(UserFilter.builder()
-                .specializations(specializations)
+                .specialization(specialization)
                 .rank(rank)
                 .hoursPerWeek(hoursPerWeek)
                 .status(ACTIVE)
@@ -89,12 +88,12 @@ public class UserController {
     }
 
     @GetMapping("/mentees")
-    public ResponseEntity<Map<String, Object>> getActiveMentees(@RequestParam(required = false) List<String> specializations,
+    public ResponseEntity<Map<String, Object>> getActiveMentees(@RequestParam(required = false) String specialization,
                                                                 @RequestParam(required = false) Double hoursPerWeek,
                                                                 @RequestParam(required = false) String rank,
                                                                 @RequestParam(value = "page", required = false, defaultValue = "1") int numberOfPage) {
         Map<String, Object> responseBody = getUsersByFilter(UserFilter.builder()
-                .specializations(specializations)
+                .specialization(specialization)
                 .rank(rank)
                 .hoursPerWeek(hoursPerWeek)
                 .status(ACTIVE)

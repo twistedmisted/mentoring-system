@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService {
             log.warn("The number of page and size of page must be greater than zero");
             throw new ResponseStatusException(BAD_REQUEST, "Номер сторінки не може бути менше 1.");
         }
-        Page<UserEntity> userPage = userRepository.findAll(where(matchSpecialization(userFilter.getSpecializations()))
+        Page<UserEntity> userPage = userRepository.findAll(where(matchSpecialization(userFilter.getSpecialization()))
                 .and(matchRank(userFilter.getRank()))
                 .and(matchHoursPerWeek(userFilter.getHoursPerWeek()))
                 .and(matchStatus(userFilter.getStatus()))

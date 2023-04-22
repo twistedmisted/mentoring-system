@@ -4,17 +4,15 @@ import org.springframework.data.jpa.domain.Specification;
 import ua.kpi.mishchenko.mentoringsystem.domain.entity.UserEntity;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.UserStatus;
 
-import java.util.List;
-
 import static java.util.Objects.isNull;
 
 public class UserSpecification {
 
-    public static Specification<UserEntity> matchSpecialization(List<String> specializations) {
-        if (isNull(specializations) || specializations.isEmpty()) {
+    public static Specification<UserEntity> matchSpecialization(String specialization) {
+        if (isNull(specialization) || specialization.isBlank()) {
             return null;
         }
-        return (root, query, criteriaBuilder) -> root.get("questionnaire").get("specialization").get("name").in(specializations);
+        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("questionnaire").get("specialization").get("name"), specialization);
     }
 
     public static Specification<UserEntity> matchRank(String rank) {

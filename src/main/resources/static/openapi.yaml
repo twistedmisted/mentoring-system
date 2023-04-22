@@ -550,9 +550,9 @@ paths:
           required: false
           example: "Trainee"
         - in: "path"
-          name: "specializations"
+          name: "specialization"
           required: false
-          example: "JavaScript,Java"
+          example: "JavaScript"
         - in: "path"
           name: "hoursPerWeek"
           required: false
@@ -672,9 +672,9 @@ paths:
           required: false
           example: "Trainee"
         - in: "path"
-          name: "specializations"
+          name: "specialization"
           required: false
-          example: "JavaScript,Java"
+          example: "JavaScript"
         - in: "path"
           name: "hoursPerWeek"
           required: false
