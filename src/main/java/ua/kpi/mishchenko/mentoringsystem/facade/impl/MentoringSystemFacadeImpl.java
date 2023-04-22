@@ -17,6 +17,7 @@ import ua.kpi.mishchenko.mentoringsystem.domain.payload.UserWithPhoto;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.MentoringRequestFilter;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.PhotoExtension;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.UserFilter;
+import ua.kpi.mishchenko.mentoringsystem.domain.util.UserStatus;
 import ua.kpi.mishchenko.mentoringsystem.exception.IllegalPhotoExtensionException;
 import ua.kpi.mishchenko.mentoringsystem.facade.MentoringSystemFacade;
 import ua.kpi.mishchenko.mentoringsystem.service.MentoringRequestService;
@@ -69,6 +70,12 @@ public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
 
     private String getProfilePhotoUrlByUserId(Long userId) {
         return s3Service.getUserPhoto(userId);
+    }
+
+    @Override
+    public UserStatus getUserStatusByEmail(String email) {
+        log.debug("Getting user status by email = [{}]", email);
+        return userService.getUserStatusByEmail(email);
     }
 
     @Override

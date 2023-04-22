@@ -62,6 +62,15 @@ public class UserController {
         return (isNull(principal) || !principal.getName().equals(email)) && !status.equals(ACTIVE);
     }
 
+    @GetMapping("/me/status")
+    public ResponseEntity<Map<String, Object>> getMeStatus(Principal principal) {
+        log.debug("Getting status for user with email = [{}]", principal.getName());
+        UserStatus meStatus = mentoringSystemFacade.getUserStatusByEmail(principal.getName());
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("status", meStatus);
+        return new ResponseEntity<>(responseBody, OK);
+    }
+
     @GetMapping("/mentors")
     public ResponseEntity<Map<String, Object>> getActiveMentors(@RequestParam(required = false) List<String> specializations,
                                                                 @RequestParam(required = false) Double hoursPerWeek,

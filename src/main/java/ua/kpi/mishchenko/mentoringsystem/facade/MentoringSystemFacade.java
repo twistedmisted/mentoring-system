@@ -9,12 +9,15 @@ import ua.kpi.mishchenko.mentoringsystem.domain.payload.UserWithPassword;
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.UserWithPhoto;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.MentoringRequestFilter;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.UserFilter;
+import ua.kpi.mishchenko.mentoringsystem.domain.util.UserStatus;
 
 public interface MentoringSystemFacade {
 
     UserDTO getUserById(Long userId);
 
     UserWithPhoto getUserWithPhotoById(Long userId);
+
+    UserStatus getUserStatusByEmail(String email);
 
     void updateUserById(Long userId, UserWithPassword user, MultipartFile photo);
 

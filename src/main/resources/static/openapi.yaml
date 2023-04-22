@@ -407,6 +407,47 @@ paths:
                     example: "/api/v1/users/1"
       security:
         - jwt_token: [ ]
+  /api/v1/users/me/status:
+    get:
+      tags:
+        - User
+      summary: Return a user status
+      responses:
+        '200':
+          description: A JSON map with user status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - NEEDS_INFORMATION
+                      - ACTIVE
+        '404':
+          description: Cannot find user by email
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: "about:blank"
+                  title:
+                    type: string
+                    example: "Not Found"
+                  status:
+                    type: integer
+                    format: int32
+                    example: 404
+                  detail:
+                    type: string
+                    example: "Не вдається знайти даного користувача."
+                  instance:
+                    type: string
+                    example: "/api/v1/users/me/status"
   /api/v1/users/mentors:
     get:
       tags:
