@@ -82,7 +82,7 @@ public class JwtSecurityConfig {
         return http.cors().and()
                 .csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers(POST, API_PATH + "/auth/**").permitAll()
+                .requestMatchers(POST, API_PATH + "/auth/login", API_PATH + "/auth/register").permitAll()
                 .requestMatchers(AUTH_WHITELIST).permitAll()
                 .requestMatchers(GET,
                         API_PATH + "/users/{id}/**",
