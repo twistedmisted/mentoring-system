@@ -29,13 +29,6 @@ public class UserSpecification {
         return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("status"), status);
     }
 
-    public static Specification<UserEntity> matchHoursPerWeek(Integer hoursPerWeek) {
-        if (isNull(hoursPerWeek) || hoursPerWeek < 1) {
-            return null;
-        }
-        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("questionnaire").get("hoursPerWeek"), hoursPerWeek);
-    }
-
     public static Specification<UserEntity> matchRole(String role) {
         if (isNull(role) || role.isBlank()) {
             return null;
