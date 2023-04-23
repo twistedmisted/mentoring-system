@@ -29,7 +29,7 @@ public class UserSpecification {
         return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("status"), status);
     }
 
-    public static Specification<UserEntity> matchHoursPerWeek(Double hoursPerWeek) {
+    public static Specification<UserEntity> matchHoursPerWeek(Integer hoursPerWeek) {
         if (isNull(hoursPerWeek) || hoursPerWeek < 1) {
             return null;
         }
@@ -43,7 +43,7 @@ public class UserSpecification {
         return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("role").get("name"), role);
     }
 
-    public static Specification<UserEntity> hoursLessThanMaxValue(Double hours) {
+    public static Specification<UserEntity> hoursLessThanMaxValue(Integer hours) {
         if (isNull(hours) || hours <= 0) {
             return null;
         }
@@ -51,7 +51,7 @@ public class UserSpecification {
                 .get("hoursPerWeek"), hours);
     }
 
-    public static Specification<UserEntity> hoursGreaterThanMinValue(Double hours) {
+    public static Specification<UserEntity> hoursGreaterThanMinValue(Integer hours) {
         if (isNull(hours) || hours <= 0) {
             return null;
         }

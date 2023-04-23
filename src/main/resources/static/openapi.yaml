@@ -313,8 +313,11 @@ paths:
                         type: string
                         example: "Specialization"
                       hoursPerWeek:
-                        type: number
-                        example: 20.5
+                        type: integer
+                        format: int32
+                        example: 20
+                        minimum: 1
+                        maximum: 168
                   profilePhotoUrl:
                     type: string
                     example: "https://url.com/profile-photo.jpg"
@@ -404,8 +407,11 @@ paths:
                           type: string
                           example: "Specialization"
                         hoursPerWeek:
-                          type: number
-                          example: 20.5
+                          type: integer
+                          format: int32
+                          example: 20
+                          minimum: 1
+                          maximum: 168
                 photo:
                   type: string
                   format: binary
@@ -555,8 +561,12 @@ paths:
           example: "JavaScript"
         - in: "path"
           name: "hoursPerWeek"
-          required: false
-          example: "40.5"
+          schema:
+            type: integer
+            format: int32
+            example: 20
+            minimum: 1
+            maximum: 168
         - in: "path"
           name: "page"
           required: false
@@ -625,8 +635,11 @@ paths:
                                   type: string
                                   example: "Specialization"
                                 hoursPerWeek:
-                                  type: number
-                                  example: 20.5
+                                  type: integer
+                                  format: int32
+                                  example: 20
+                                  minimum: 1
+                                  maximum: 168
                             profilePhotoUrl:
                               type: string
                               example: "https://url.com/profile-photo.jpg"
@@ -677,8 +690,12 @@ paths:
           example: "JavaScript"
         - in: "path"
           name: "hoursPerWeek"
-          required: false
-          example: "40.5"
+          schema:
+            type: integer
+            format: int32
+            example: 20
+            minimum: 1
+            maximum: 168
         - in: "path"
           name: "page"
           required: false
@@ -747,8 +764,11 @@ paths:
                                   type: string
                                   example: "Specialization"
                                 hoursPerWeek:
-                                  type: number
-                                  example: 20.5
+                                  type: integer
+                                  format: int32
+                                  example: 20
+                                  minimum: 1
+                                  maximum: 168
                             profilePhotoUrl:
                               type: string
                               example: "https://url.com/profile-photo.jpg"
@@ -872,8 +892,11 @@ paths:
                                     type: string
                                     example: "Specialization"
                                   hoursPerWeek:
-                                    type: number
-                                    example: 20.5
+                                    type: integer
+                                    format: int32
+                                    example: 20
+                                    minimum: 1
+                                    maximum: 168
                               profilePhotoUrl:
                                 type: string
                                 example: "https://url.com/profile-photo.jpg"
@@ -933,8 +956,11 @@ paths:
                                     type: string
                                     example: "Specialization"
                                   hoursPerWeek:
-                                    type: number
-                                    example: 20.5
+                                    type: integer
+                                    format: int32
+                                    example: 20
+                                    minimum: 1
+                                    maximum: 168
                               profilePhotoUrl:
                                 type: string
                                 example: "https://url.com/profile-photo.jpg"
@@ -1071,8 +1097,11 @@ paths:
                                     type: string
                                     example: "Specialization"
                                   hoursPerWeek:
-                                    type: number
-                                    example: 20.5
+                                    type: integer
+                                    format: int32
+                                    example: 20
+                                    minimum: 1
+                                    maximum: 168
                               profilePhotoUrl:
                                 type: string
                                 example: "https://url.com/profile-photo.jpg"
@@ -1132,8 +1161,11 @@ paths:
                                     type: string
                                     example: "Specialization"
                                   hoursPerWeek:
-                                    type: number
-                                    example: 20.5
+                                    type: integer
+                                    format: int32
+                                    example: 20
+                                    minimum: 1
+                                    maximum: 168
                               profilePhotoUrl:
                                 type: string
                                 example: "https://url.com/profile-photo.jpg"
@@ -1568,5 +1600,8 @@ components:
               type: string
               example: "Specialization"
             hoursPerWeek:
-              type: number
-              example: 20.5
+              type: integer
+              format: int32
+              example: 20
+              minimum: 1
+              maximum: 168

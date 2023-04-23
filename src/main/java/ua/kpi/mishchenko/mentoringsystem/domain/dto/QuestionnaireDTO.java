@@ -43,5 +43,5 @@ public class QuestionnaireDTO {
 
     @NotNull(message = "Необхідно заповнити кількість годин на годину, які Ви готові приділяти.")
     @Max(value = 168, message = "Ваше значення занадто велике, спробуйте обрати інше. Максимальна кілкість годин у тижні - 168.")
-    private Double hoursPerWeek;
+    private Integer hoursPerWeek;
 }

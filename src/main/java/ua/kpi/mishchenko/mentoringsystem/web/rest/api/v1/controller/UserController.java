@@ -74,7 +74,7 @@ public class UserController {
 
     @GetMapping("/mentors")
     public ResponseEntity<Map<String, Object>> getActiveMentors(@RequestParam(required = false) String specialization,
-                                                                @RequestParam(required = false) Double hoursPerWeek,
+                                                                @RequestParam(required = false) Integer hoursPerWeek,
                                                                 @RequestParam(required = false) String rank,
                                                                 @RequestParam(value = "page", required = false, defaultValue = "1") int numberOfPage) {
         Map<String, Object> responseBody = getUsersByFilter(UserFilter.builder()
@@ -89,7 +89,7 @@ public class UserController {
 
     @GetMapping("/mentees")
     public ResponseEntity<Map<String, Object>> getActiveMentees(@RequestParam(required = false) String specialization,
-                                                                @RequestParam(required = false) Double hoursPerWeek,
+                                                                @RequestParam(required = false) Integer hoursPerWeek,
                                                                 @RequestParam(required = false) String rank,
                                                                 @RequestParam(value = "page", required = false, defaultValue = "1") int numberOfPage) {
         Map<String, Object> responseBody = getUsersByFilter(UserFilter.builder()

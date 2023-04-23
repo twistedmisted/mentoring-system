@@ -11,6 +11,6 @@ public class UserFilter {
     private String rank;
     private UserStatus status;
     private String role;
-    private Double minHours;
-    private Double maxHours;
+    private Integer minHours;
+    private Integer maxHours;
 }

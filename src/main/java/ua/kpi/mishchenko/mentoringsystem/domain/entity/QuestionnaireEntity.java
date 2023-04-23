@@ -46,7 +46,7 @@ public class QuestionnaireEntity {
     private String linkedin;
 
     @Column(name = "hours_per_week", nullable = false)
-    private Double hoursPerWeek;
+    private Integer hoursPerWeek;
 
     @OneToOne
     @MapsId
