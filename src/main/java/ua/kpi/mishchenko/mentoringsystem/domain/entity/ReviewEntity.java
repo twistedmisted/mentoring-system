@@ -10,6 +10,8 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.sql.Timestamp;
+
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -26,9 +28,16 @@ public class ReviewEntity {
     private String text;
 
     @Column(name = "rating", nullable = false)
-    private Double rating;
+    private Integer rating;
+
+    @Column(name = "created_at", nullable = false)
+    private Timestamp createdAt;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private UserEntity user;
+    @JoinColumn(name = "to_user_id", nullable = false)
+    private UserEntity toUser;
+
+    @ManyToOne
+    @JoinColumn(name = "from_user_id", nullable = false)
+    private UserEntity fromUser;
 }

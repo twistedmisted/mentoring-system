@@ -17,6 +17,7 @@ import static java.util.Objects.isNull;
 public class ReviewMapper implements Mapper<ReviewEntity, ReviewDTO> {
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     @Override
     public ReviewEntity dtoToEntity(ReviewDTO dto) {
@@ -27,8 +28,10 @@ public class ReviewMapper implements Mapper<ReviewEntity, ReviewDTO> {
         entity.setId(dto.getId());
         entity.setText(dto.getText());
         entity.setRating(dto.getRating());
-        entity.setUser(userRepository.findById(dto.getUserId()).get());
-        return null;
+        entity.setCreatedAt(dto.getCreatedAt());
+        entity.setToUser(userRepository.findById(dto.getToUser().getId()).get());
+        entity.setFromUser(userRepository.findById(dto.getFromUser().getId()).get());
+        return entity;
     }
 
     @Override
@@ -40,7 +43,9 @@ public class ReviewMapper implements Mapper<ReviewEntity, ReviewDTO> {
         dto.setId(entity.getId());
         dto.setText(entity.getText());
         dto.setRating(entity.getRating());
-        dto.setUserId(entity.getUser().getId());
+        dto.setCreatedAt(entity.getCreatedAt());
+        dto.setToUser(userMapper.entityToDto(entity.getToUser()));
+        dto.setFromUser(userMapper.entityToDto(entity.getFromUser()));
         return dto;
     }
 

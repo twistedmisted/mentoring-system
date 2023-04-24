@@ -8,6 +8,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import ua.kpi.mishchenko.mentoringsystem.domain.bo.PageBO;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.QuestionnaireDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.UserDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.entity.QuestionnaireEntity;
@@ -15,7 +16,6 @@ import ua.kpi.mishchenko.mentoringsystem.domain.entity.RankEntity;
 import ua.kpi.mishchenko.mentoringsystem.domain.entity.SpecializationEntity;
 import ua.kpi.mishchenko.mentoringsystem.domain.entity.UserEntity;
 import ua.kpi.mishchenko.mentoringsystem.domain.mapper.impl.UserMapper;
-import ua.kpi.mishchenko.mentoringsystem.domain.payload.PageBO;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.UserFilter;
 import ua.kpi.mishchenko.mentoringsystem.repository.RankRepository;
 import ua.kpi.mishchenko.mentoringsystem.repository.SpecializationRepository;
@@ -43,7 +43,7 @@ import static ua.kpi.mishchenko.mentoringsystem.util.Util.lessThanOne;
 @Slf4j
 public class UserServiceImpl implements UserService {
 
-    private static final int PAGE_SIZE = 5;
+    private static final int PAGE_SIZE = 6;
 
     private final UserRepository userRepository;
     private final RankRepository rankRepository;
@@ -208,5 +208,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean existsByIdAndEmail(Long id, String email) {
         return userRepository.existsByIdAndEmail(id, email);
+    }
+
+    @Override
+    public Long getUserIdByEmail(String fromEmail) {
+        return userRepository.findByEmail(fromEmail)
+                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Не вдається знайти такого користувача."))
+                .getId();
     }
 }

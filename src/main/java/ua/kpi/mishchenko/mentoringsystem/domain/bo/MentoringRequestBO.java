@@ -1,4 +1,4 @@
-package ua.kpi.mishchenko.mentoringsystem.domain.payload;
+package ua.kpi.mishchenko.mentoringsystem.domain.bo;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

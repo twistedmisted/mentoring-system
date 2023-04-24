@@ -19,6 +19,7 @@ public class UserWithPhoto {
     private UserStatus status;
     private String createdAt;
     private String role;
+    private double rating;
 
     @JsonInclude(NON_NULL)
     private QuestionnaireDTO questionnaire;

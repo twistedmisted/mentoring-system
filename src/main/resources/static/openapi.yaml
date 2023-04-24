@@ -290,6 +290,9 @@ paths:
                     enum:
                       - MENTOR
                       - MENTEE
+                  rating:
+                    type: number
+                    example: 3.5
                   questionnaire:
                     type: object
                     properties:
@@ -492,6 +495,9 @@ paths:
                         enum:
                           - MENTOR
                           - MENTEE
+                      rating:
+                        type: number
+                        example: 3.5
                       questionnaire:
                         type: object
                         properties:
@@ -612,6 +618,9 @@ paths:
                             role:
                               type: string
                               example: MENTOR
+                            rating:
+                              type: number
+                              example: 3.5
                             questionnaire:
                               type: object
                               properties:
@@ -741,6 +750,9 @@ paths:
                             role:
                               type: string
                               example: MENTEE
+                            rating:
+                              type: number
+                              example: 3.5
                             questionnaire:
                               type: object
                               properties:
@@ -1506,6 +1518,130 @@ paths:
                   instance:
                     type: string
                     example: "/api/v1/mentoring-requests/cancel/1"
+      security:
+        - jwt_token: [ ]
+
+  /api/v1/reviews:
+    get:
+      tags:
+        - Review
+      summary: Returns a list of reviews for user
+      parameters:
+        - in: path
+          name: user
+          description: User id for searching reviews
+          example: 1
+          required: true
+      responses:
+        '200':
+          description: A JSON page with reviews for user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  page:
+                    type: object
+                    properties:
+                      content:
+                        type: array
+                        items:
+                          properties:
+                            name:
+                              type: string
+                              example: "Name"
+                            surname:
+                              type: string
+                              example: "Surname"
+                            text:
+                              type: string
+                              example: "Review text"
+                            rating:
+                              type: integer
+                              format: int32
+                              example: 4
+                            createdAt:
+                              type: string
+                              example: "21.04.2023"
+                      currentPageNumber:
+                        type: integer
+                        format: int32
+                        example: 1
+                      totalPages:
+                        type: integer
+                        format: int32
+                        example: 2
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: "about:blank"
+                  title:
+                    type: string
+                    example: "Bad Request"
+                  status:
+                    type: integer
+                    format: int32
+                    example: 400
+                  detail:
+                    type: string
+                    example: "Номер сторінки не може бути менше 1."
+                  instance:
+                    type: string
+                    example: "/api/v1/reviews"
+    post:
+      tags:
+        - Review
+      summary: Creates a new review
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                toUserId:
+                  type: integer
+                  format: int64
+                  example: 1
+                  required: true
+                text:
+                  type: string
+                  example: "Review text"
+                  required: true
+                rating:
+                  type: integer
+                  format: int32
+      responses:
+        '201':
+          description: A review was successfully created
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: "about:blank"
+                  title:
+                    type: string
+                    example: "Bad Request"
+                  status:
+                    type: integer
+                    format: int32
+                    example: 400
+                  detail:
+                    type: string
+                    example: "Ви можете писати лише 1 коментарій для 1 користувача."
+                  instance:
+                    type: string
+                    example: "/api/v1/users/mentors"
       security:
         - jwt_token: [ ]
 

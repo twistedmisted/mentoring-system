@@ -13,5 +13,7 @@ public interface MentoringRequestRepository extends CrudRepository<MentoringRequ
 
     Page<MentoringRequestEntity> findAll(Specification<MentoringRequestEntity> specification, Pageable pageable);
 
-    boolean existsByFromEmailAndToIdAndStatus(String fromEmail, Long toUserId, MentoringRequestStatus pending);
+    boolean existsByFromEmailAndToIdAndStatus(String fromEmail, Long toUserId, MentoringRequestStatus status);
+
+    boolean existsByToIdAndFromIdAndStatus(Long toUserId, Long fromUserId, MentoringRequestStatus status);
 }
