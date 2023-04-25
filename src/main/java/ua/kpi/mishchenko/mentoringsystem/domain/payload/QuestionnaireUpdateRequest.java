@@ -32,7 +32,7 @@ public class QuestionnaireUpdateRequest {
     @NotBlank(message = "Необхідно обрати свою спеціалізацію.")
     private String specialization;
 
-    @URL(message = "Посилання на профіль з LinkedIn некоректне.", regexp = "^https://www.linkedin.com")
+    @URL(message = "Посилання на профіль з LinkedIn некоректне.", regexp = "^(http(s)?:\\/\\/)?([\\w]+\\.)?linkedin\\.com\\/(pub|in|profile)\\/([-a-zA-Z0-9]+)\\/*")
     private String linkedin;
 
     @NotNull(message = "Необхідно заповнити кількість годин на годину, які Ви готові приділяти.")
