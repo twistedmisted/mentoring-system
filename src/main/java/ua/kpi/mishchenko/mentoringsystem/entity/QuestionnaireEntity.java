@@ -1,5 +1,6 @@
 package ua.kpi.mishchenko.mentoringsystem.entity;
 
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
@@ -9,13 +10,14 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "questionnaires")
@@ -33,11 +35,15 @@ public class QuestionnaireEntity {
     private String about;
 
     @ElementCollection
+    @CollectionTable(name = "skills",
+            uniqueConstraints = @UniqueConstraint(columnNames = {"questionnaire_entity_user_id", "skills"}))
     @NotEmpty(message = "Необхідно додати навички.")
-    private List<String> skills = new ArrayList<>();
+    private Set<String> skills = new HashSet<>();
 
     @ElementCollection
-    private List<String> companies = new ArrayList<>();
+    @CollectionTable(name = "companies",
+            uniqueConstraints = @UniqueConstraint(columnNames = {"questionnaire_entity_user_id", "companies"}))
+    private Set<String> companies = new HashSet<>();
 
     @ManyToOne
     @JoinColumn(name = "rank_id", nullable = false)

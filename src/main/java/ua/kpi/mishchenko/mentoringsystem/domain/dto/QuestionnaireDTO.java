@@ -8,9 +8,9 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import ua.kpi.mishchenko.mentoringsystem.validation.ListSize;
+import ua.kpi.mishchenko.mentoringsystem.validation.SetSize;
 
-import java.util.List;
+import java.util.Set;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
@@ -25,12 +25,12 @@ public class QuestionnaireDTO {
     @Size(min = 250, max = 1024, message = "Інформація про себе необхідна містити від 250 до 1024 симолів.")
     private String about;
 
-    @NotEmpty(message = "Необхідно додати від 5 до 20 навичок.")
-    @ListSize(min = 5, max = 20, message = "Необхідно додати від 5 до 20 навичок.")
-    private List<String> skills;
+    @NotEmpty(message = "Необхідно додати від 3 до 20 навичок.")
+    @SetSize(min = 3, max = 20, message = "Необхідно додати від 3 до 20 навичок.")
+    private Set<String> skills;
 
     @JsonInclude(NON_EMPTY)
-    private List<String> companies;
+    private Set<String> companies;
 
     @NotBlank(message = "Необхідно обрати свій рівень.")
     private String rank;

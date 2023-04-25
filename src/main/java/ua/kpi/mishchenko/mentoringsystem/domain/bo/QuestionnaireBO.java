@@ -2,15 +2,15 @@ package ua.kpi.mishchenko.mentoringsystem.domain.bo;
 
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 public class QuestionnaireBO {
 
     private String about = "";
-    private List<String> skills = new ArrayList<>();
-    private List<String> companies = new ArrayList<>();
+    private Set<String> skills = new HashSet<>();
+    private Set<String> companies = new HashSet<>();
     private String rank = "";
     private String specialization = "";
     private String linkedin = "";

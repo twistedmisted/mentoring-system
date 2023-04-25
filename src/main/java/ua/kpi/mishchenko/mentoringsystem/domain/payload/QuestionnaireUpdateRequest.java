@@ -7,9 +7,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
-import ua.kpi.mishchenko.mentoringsystem.validation.ListSize;
+import ua.kpi.mishchenko.mentoringsystem.validation.SetSize;
 
-import java.util.List;
+import java.util.Set;
 
 @Data
 public class QuestionnaireUpdateRequest {
@@ -18,11 +18,11 @@ public class QuestionnaireUpdateRequest {
     @Size(min = 250, max = 1024, message = "Інформація про себе необхідна містити від 250 до 1024 симолів.")
     private String about;
 
-    @NotEmpty(message = "Необхідно додати від 5 до 20 навичок.")
-    @ListSize(min = 5, max = 20, message = "Необхідно додати від 5 до 20 навичок.")
-    private List<String> skills;
+    @NotEmpty(message = "Необхідно додати від 3 до 20 навичок.")
+    @SetSize(min = 3, max = 20, message = "Необхідно додати від 3 до 20 навичок.")
+    private Set<String> skills;
 
-    private List<String> companies;
+    private Set<String> companies;
 
     @NotBlank(message = "Необхідно обрати свій рівень.")
     private String rank;
@@ -30,7 +30,7 @@ public class QuestionnaireUpdateRequest {
     @NotBlank(message = "Необхідно обрати свою спеціалізацію.")
     private String specialization;
 
-    @URL(message = "Посилання на профіль з LinkedIn некоректне.")
+    @URL(message = "Посилання на профіль з LinkedIn некоректне.", regexp = "^https://www.linkedin.com")
     private String linkedin;
 
     @NotNull(message = "Необхідно заповнити кількість годин на годину, які Ви готові приділяти.")

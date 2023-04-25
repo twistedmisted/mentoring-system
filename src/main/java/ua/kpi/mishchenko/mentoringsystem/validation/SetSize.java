@@ -2,14 +2,14 @@ package ua.kpi.mishchenko.mentoringsystem.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-import ua.kpi.mishchenko.mentoringsystem.validation.validator.ListSizeValidator;
+import ua.kpi.mishchenko.mentoringsystem.validation.validator.SetSizeValidator;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-@Constraint(validatedBy = ListSizeValidator.class)
+@Constraint(validatedBy = SetSizeValidator.class)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ListSize {
+public @interface SetSize {
 
     String message() default "The size does not meet the conditions";
 
