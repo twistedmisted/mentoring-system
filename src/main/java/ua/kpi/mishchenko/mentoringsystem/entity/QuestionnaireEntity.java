@@ -19,6 +19,8 @@ import lombok.Setter;
 import java.util.HashSet;
 import java.util.Set;
 
+import static jakarta.persistence.CascadeType.ALL;
+
 @Entity
 @Table(name = "questionnaires")
 @Setter
@@ -60,7 +62,7 @@ public class QuestionnaireEntity {
     @NotNull(message = "Необхідно вказати години на тиждень для навчання.")
     private Integer hoursPerWeek;
 
-    @OneToOne
+    @OneToOne(cascade = ALL)
     @MapsId
     @JoinColumn(name = "user_id")
     private UserEntity user;
