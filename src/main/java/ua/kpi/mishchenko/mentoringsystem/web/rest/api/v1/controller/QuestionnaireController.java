@@ -34,4 +34,11 @@ public class QuestionnaireController {
         mentoringSystemFacade.updateQuestionnaireByUserEmail(principal.getName(), questionnaire, photo);
         return new ResponseEntity<>(NO_CONTENT);
     }
+
+    @PutMapping("/delete-photo")
+    public ResponseEntity<?> deleteProfilePhoto(Principal principal) {
+        log.debug("Removing user profile photo by email = [{}]", principal.getName());
+        mentoringSystemFacade.deleteProfilePhotoByUserEmail(principal.getName());
+        return new ResponseEntity<>(NO_CONTENT);
+    }
 }

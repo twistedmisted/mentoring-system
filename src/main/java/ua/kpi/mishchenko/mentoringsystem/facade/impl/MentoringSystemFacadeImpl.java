@@ -14,7 +14,6 @@ import ua.kpi.mishchenko.mentoringsystem.domain.dto.MentoringRequestDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.QuestionnaireDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.ReviewDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.UserDTO;
-import ua.kpi.mishchenko.mentoringsystem.domain.mapper.impl.UserMapper;
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.CreateReviewRequest;
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.MentoringRequestResponse;
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.QuestionnaireUpdateRequest;
@@ -248,5 +247,11 @@ public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
     public void updateUserPasswordByEmail(String email, UpdatePasswordRequest passwordRequest) {
         log.debug("Updating user password by email = [{}]", email);
         userService.updateUserPasswordByEmail(email, passwordRequest);
+    }
+
+    @Override
+    public void deleteProfilePhotoByUserEmail(String email) {
+        UserDTO user = userService.getUserByEmail(email);
+        s3Service.removeUserPhoto(user.getId());
     }
 }

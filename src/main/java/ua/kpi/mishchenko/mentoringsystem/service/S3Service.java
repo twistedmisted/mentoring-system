@@ -7,4 +7,6 @@ public interface S3Service {
     void uploadUserPhoto(Long userId, MediaDTO userPhoto);
 
     String getUserPhoto(Long userId);
+
+    void removeUserPhoto(Long userId);
 }

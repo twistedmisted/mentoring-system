@@ -847,6 +847,40 @@ paths:
       security:
         - jwt_token: [ ]
 
+  /api/v1/questionnaires/delete-photo:
+    put:
+      tags:
+        - Questionnaire
+      summary: Deletes user profile photo
+      responses:
+        '204':
+          description: User profile photo was successfully removed
+        '404':
+          description: An error of not found user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: "about:blank"
+                  title:
+                    type: string
+                    example: "Not Found"
+                  status:
+                    type: integer
+                    format: int32
+                    example: 404
+                  detail:
+                    type: string
+                    example: "Не вдається знайти такого користувача."
+                  instance:
+                    type: string
+                    example: "/api/v1/questionnaires/delete-photo"
+      security:
+        - jwt_token: [ ]
+
   /api/v1/mentoring-requests/from-me:
     get:
       tags:

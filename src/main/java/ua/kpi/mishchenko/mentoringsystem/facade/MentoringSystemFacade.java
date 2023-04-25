@@ -37,4 +37,6 @@ public interface MentoringSystemFacade {
     void updateQuestionnaireByUserEmail(String email, QuestionnaireUpdateRequest questionnaire, MultipartFile photo);
 
     void updateUserPasswordByEmail(String email, UpdatePasswordRequest passwordRequest);
+
+    void deleteProfilePhotoByUserEmail(String name);
 }

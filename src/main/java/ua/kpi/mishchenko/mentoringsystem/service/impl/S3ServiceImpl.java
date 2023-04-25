@@ -1,5 +1,6 @@
 package ua.kpi.mishchenko.mentoringsystem.service.impl;
 
+import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import jakarta.annotation.PostConstruct;
@@ -61,5 +62,19 @@ public class S3ServiceImpl implements S3Service {
         return s3Client.getAmazonS3().listObjects(BUCKET_NAME, prefix).getObjectSummaries().stream()
                 .map(S3ObjectSummary::getKey)
                 .toList();
+    }
+
+    @Override
+    public void removeUserPhoto(Long userId) {
+        log.debug("Removing user photo from S3 by userId = [{}]", userId);
+        List<String> keysToDelete = findAllKeysByPrefix(USERS_FOLDER + SLASH + userId + SLASH);
+        if (keysToDelete.isEmpty()) {
+            log.info("Cannot find user photo for user with id = [{}]", userId);
+            return;
+        }
+        DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest(BUCKET_NAME)
+                .withKeys(keysToDelete.toArray(new String[0]));
+        s3Client.getAmazonS3().deleteObjects(deleteObjectsRequest);
+        log.debug("The user photo were removed successfully");
     }
 }
