@@ -218,7 +218,7 @@ public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
 
     @Override
     @Transactional
-    public void updateQuestionnaireByUserEmail(String email, QuestionnaireUpdateRequest questionnaire, MultipartFile photo) {
+    public UserWithQuestionnaire updateQuestionnaireByUserEmail(String email, QuestionnaireUpdateRequest questionnaire, MultipartFile photo) {
         log.debug("Updating questionnaire by user email = [{}]", email);
         Long userId = userService.getUserByEmail(email).getId();
         if (!isNull(photo)) {
@@ -228,6 +228,7 @@ public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
             questionnaireService.updateQuestionnaire(createQuestionnaireDto(questionnaire, userId));
             userService.updateUserStatusById(userId, ACTIVE);
         }
+        return getUserWithPhotoById(userId);
     }
 
     private QuestionnaireDTO createQuestionnaireDto(QuestionnaireUpdateRequest questionnaire, Long userId) {

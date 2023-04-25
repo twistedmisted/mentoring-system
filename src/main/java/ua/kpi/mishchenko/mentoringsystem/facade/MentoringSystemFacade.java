@@ -34,7 +34,7 @@ public interface MentoringSystemFacade {
 
     void createReview(CreateReviewRequest review, String fromEmail);
 
-    void updateQuestionnaireByUserEmail(String email, QuestionnaireUpdateRequest questionnaire, MultipartFile photo);
+    UserWithQuestionnaire updateQuestionnaireByUserEmail(String email, QuestionnaireUpdateRequest questionnaire, MultipartFile photo);
 
     void updateUserPasswordByEmail(String email, UpdatePasswordRequest passwordRequest);
 

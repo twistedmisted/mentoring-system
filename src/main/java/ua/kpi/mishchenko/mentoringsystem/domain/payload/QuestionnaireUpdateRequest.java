@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 import ua.kpi.mishchenko.mentoringsystem.validation.SetSize;
+import ua.kpi.mishchenko.mentoringsystem.validation.UniqueSetElements;
 
 import java.util.Set;
 
@@ -20,6 +21,7 @@ public class QuestionnaireUpdateRequest {
 
     @NotEmpty(message = "Необхідно додати від 3 до 20 навичок.")
     @SetSize(min = 3, max = 20, message = "Необхідно додати від 3 до 20 навичок.")
+    @UniqueSetElements(message = "Не можливо зберегти навички, оскільки виявлено дублювання.")
     private Set<String> skills;
 
     private Set<String> companies;

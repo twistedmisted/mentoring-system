@@ -10,11 +10,15 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.QuestionnaireUpdateRequest;
+import ua.kpi.mishchenko.mentoringsystem.domain.payload.UserWithQuestionnaire;
 import ua.kpi.mishchenko.mentoringsystem.facade.MentoringSystemFacade;
 
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @RequestMapping("/api/v1/questionnaires")
@@ -31,8 +35,10 @@ public class QuestionnaireController {
                                                  MultipartFile photo,
                                                  Principal principal) {
         log.debug("Updating questionnaire for user with email = [{}]", principal.getName());
-        mentoringSystemFacade.updateQuestionnaireByUserEmail(principal.getName(), questionnaire, photo);
-        return new ResponseEntity<>(NO_CONTENT);
+        UserWithQuestionnaire user = mentoringSystemFacade.updateQuestionnaireByUserEmail(principal.getName(), questionnaire, photo);
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("user", user);
+        return new ResponseEntity<>(responseBody, OK);
     }
 
     @PutMapping("/delete-photo")
