@@ -7,22 +7,26 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ua.kpi.mishchenko.mentoringsystem.domain.bo.MentoringRequestBO;
 import ua.kpi.mishchenko.mentoringsystem.domain.bo.PageBO;
+import ua.kpi.mishchenko.mentoringsystem.domain.bo.QuestionnaireBO;
 import ua.kpi.mishchenko.mentoringsystem.domain.bo.ReviewBO;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.MediaDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.MentoringRequestDTO;
+import ua.kpi.mishchenko.mentoringsystem.domain.dto.QuestionnaireDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.ReviewDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.UserDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.mapper.impl.UserMapper;
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.CreateReviewRequest;
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.MentoringRequestResponse;
-import ua.kpi.mishchenko.mentoringsystem.domain.payload.UserWithPassword;
-import ua.kpi.mishchenko.mentoringsystem.domain.payload.UserWithPhoto;
+import ua.kpi.mishchenko.mentoringsystem.domain.payload.QuestionnaireUpdateRequest;
+import ua.kpi.mishchenko.mentoringsystem.domain.payload.UpdatePasswordRequest;
+import ua.kpi.mishchenko.mentoringsystem.domain.payload.UserWithQuestionnaire;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.MentoringRequestFilter;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.PhotoExtension;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.UserFilter;
 import ua.kpi.mishchenko.mentoringsystem.exception.IllegalPhotoExtensionException;
 import ua.kpi.mishchenko.mentoringsystem.facade.MentoringSystemFacade;
 import ua.kpi.mishchenko.mentoringsystem.service.MentoringRequestService;
+import ua.kpi.mishchenko.mentoringsystem.service.QuestionnaireService;
 import ua.kpi.mishchenko.mentoringsystem.service.ReviewService;
 import ua.kpi.mishchenko.mentoringsystem.service.S3Service;
 import ua.kpi.mishchenko.mentoringsystem.service.UserService;
@@ -30,6 +34,7 @@ import ua.kpi.mishchenko.mentoringsystem.service.UserService;
 import java.io.IOException;
 
 import static java.util.Objects.isNull;
+import static ua.kpi.mishchenko.mentoringsystem.domain.util.UserStatus.ACTIVE;
 import static ua.kpi.mishchenko.mentoringsystem.service.impl.S3ServiceImpl.PROFILE_PHOTO;
 import static ua.kpi.mishchenko.mentoringsystem.util.Util.getTimestampNow;
 import static ua.kpi.mishchenko.mentoringsystem.util.Util.parseTimestampToStringDate;
@@ -42,11 +47,11 @@ public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
     private final UserService userService;
     private final MentoringRequestService mentoringRequestService;
     private final S3Service s3Service;
-    private final UserMapper userMapper;
     private final ReviewService reviewService;
+    private final QuestionnaireService questionnaireService;
 
     @Override
-    public UserWithPhoto getUserWithPhotoById(Long userId) {
+    public UserWithQuestionnaire getUserWithPhotoById(Long userId) {
         log.debug("Getting user with photo by id = [{}]", userId);
         UserDTO userDTO = userService.getUserById(userId);
         String profilePhotoUrl = getProfilePhotoUrlByUserId(userId);
@@ -54,15 +59,15 @@ public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
     }
 
     @Override
-    public UserWithPhoto getUserByEmail(String email) {
+    public UserWithQuestionnaire getUserByEmail(String email) {
         log.debug("Getting user with photo by email = [{}]", email);
         UserDTO userDTO = userService.getUserByEmail(email);
         String profilePhotoUrl = getProfilePhotoUrlByUserId(userDTO.getId());
         return createUserWithPhoto(userDTO, profilePhotoUrl);
     }
 
-    private UserWithPhoto createUserWithPhoto(UserDTO userDTO, String profilePhotoUrl) {
-        return UserWithPhoto.builder()
+    private UserWithQuestionnaire createUserWithPhoto(UserDTO userDTO, String profilePhotoUrl) {
+        return UserWithQuestionnaire.builder()
                 .id(userDTO.getId())
                 .name(userDTO.getName())
                 .surname(userDTO.getSurname())
@@ -71,23 +76,28 @@ public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
                 .status(userDTO.getStatus())
                 .createdAt(parseTimestampToStringDate(userDTO.getCreatedAt()))
                 .rating(reviewService.getAvgRatingByUserId(userDTO.getId()))
-                .questionnaire(userDTO.getQuestionnaire())
-                .profilePhotoUrl(profilePhotoUrl)
+                .questionnaire(createQuestionnaireBO(userDTO.getQuestionnaire(), profilePhotoUrl))
                 .build();
+    }
+
+    private QuestionnaireBO createQuestionnaireBO(QuestionnaireDTO questionnaire, String profilePhotoUrl) {
+        if (isNull(questionnaire)) {
+            return new QuestionnaireBO();
+        }
+        QuestionnaireBO questionnaireBO = new QuestionnaireBO();
+        questionnaireBO.setRank(questionnaire.getRank());
+        questionnaireBO.setCompanies(questionnaire.getCompanies());
+        questionnaireBO.setSkills(questionnaire.getSkills());
+        questionnaireBO.setLinkedin(questionnaire.getLinkedin());
+        questionnaireBO.setSpecialization(questionnaire.getSpecialization());
+        questionnaireBO.setAbout(questionnaire.getAbout());
+        questionnaireBO.setHoursPerWeek(questionnaire.getHoursPerWeek());
+        questionnaireBO.setProfilePhotoUrl(profilePhotoUrl);
+        return questionnaireBO;
     }
 
     private String getProfilePhotoUrlByUserId(Long userId) {
         return s3Service.getUserPhoto(userId);
-    }
-
-    @Override
-    public void updateUserById(Long userId, UserWithPassword user, MultipartFile photo) {
-        if (!isNull(photo)) {
-            s3Service.uploadUserPhoto(userId, parseToMediaDTO(photo));
-        }
-        if (!isNull(user)) {
-            userService.updateUserById(userId, userMapper.userWithPasswordToDto(user));
-        }
     }
 
     private MediaDTO parseToMediaDTO(MultipartFile photo) {
@@ -110,14 +120,9 @@ public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
     }
 
     @Override
-    public boolean checkIfIdAndEmailMatch(Long id, String email) {
-        return userService.existsByIdAndEmail(id, email);
-    }
-
-    @Override
-    public PageBO<UserWithPhoto> getUsers(UserFilter userFilter, int numberOfPage) {
+    public PageBO<UserWithQuestionnaire> getUsers(UserFilter userFilter, int numberOfPage) {
         PageBO<UserDTO> userPage = userService.getUsers(userFilter, numberOfPage);
-        PageBO<UserWithPhoto> userWithPhotoPage = new PageBO<>(userPage.getCurrentPageNumber(), userPage.getTotalPages());
+        PageBO<UserWithQuestionnaire> userWithPhotoPage = new PageBO<>(userPage.getCurrentPageNumber(), userPage.getTotalPages());
         for (UserDTO userDTO : userPage.getContent()) {
             String profilePhotoUrl = getProfilePhotoUrlByUserId(userDTO.getId());
             userWithPhotoPage.addElement(createUserWithPhoto(userDTO, profilePhotoUrl));
@@ -210,5 +215,38 @@ public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
         reviewDto.setRating(review.getRating());
         reviewDto.setCreatedAt(getTimestampNow());
         return reviewDto;
+    }
+
+    @Override
+    @Transactional
+    public void updateQuestionnaireByUserEmail(String email, QuestionnaireUpdateRequest questionnaire, MultipartFile photo) {
+        log.debug("Updating questionnaire by user email = [{}]", email);
+        Long userId = userService.getUserByEmail(email).getId();
+        if (!isNull(photo)) {
+            s3Service.uploadUserPhoto(userId, parseToMediaDTO(photo));
+        }
+        if (!isNull(questionnaire)) {
+            questionnaireService.updateQuestionnaire(createQuestionnaireDto(questionnaire, userId));
+            userService.updateUserStatusById(userId, ACTIVE);
+        }
+    }
+
+    private QuestionnaireDTO createQuestionnaireDto(QuestionnaireUpdateRequest questionnaire, Long userId) {
+        QuestionnaireDTO dto = new QuestionnaireDTO();
+        dto.setUserId(userId);
+        dto.setAbout(questionnaire.getAbout());
+        dto.setLinkedin(questionnaire.getLinkedin());
+        dto.setCompanies(questionnaire.getCompanies());
+        dto.setSkills(questionnaire.getSkills());
+        dto.setSpecialization(questionnaire.getSpecialization());
+        dto.setRank(questionnaire.getRank());
+        dto.setHoursPerWeek(questionnaire.getHoursPerWeek());
+        return dto;
+    }
+
+    @Override
+    public void updateUserPasswordByEmail(String email, UpdatePasswordRequest passwordRequest) {
+        log.debug("Updating user password by email = [{}]", email);
+        userService.updateUserPasswordByEmail(email, passwordRequest);
     }
 }

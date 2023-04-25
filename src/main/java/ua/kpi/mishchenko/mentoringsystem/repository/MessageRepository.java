@@ -2,8 +2,8 @@ package ua.kpi.mishchenko.mentoringsystem.repository;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
-import ua.kpi.mishchenko.mentoringsystem.entity.QuestionnaireEntity;
+import ua.kpi.mishchenko.mentoringsystem.entity.MessageEntity;
 
 @Repository
-public interface QuestionnaireRepository extends CrudRepository<QuestionnaireEntity, Long> {
+public interface MessageRepository extends CrudRepository<MessageEntity, Long> {
 }

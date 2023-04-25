@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ua.kpi.mishchenko.mentoringsystem.domain.entity.UserEntity;
+import ua.kpi.mishchenko.mentoringsystem.entity.UserEntity;
 import ua.kpi.mishchenko.mentoringsystem.repository.UserRepository;
 
 import java.util.Collections;

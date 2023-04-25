@@ -1,4 +1,4 @@
-package ua.kpi.mishchenko.mentoringsystem.domain.redis.hash;
+package ua.kpi.mishchenko.mentoringsystem.entity.redis.hash;
 
 import lombok.Builder;
 import lombok.Getter;

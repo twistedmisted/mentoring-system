@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import ua.kpi.mishchenko.mentoringsystem.domain.entity.ReviewEntity;
+import ua.kpi.mishchenko.mentoringsystem.entity.ReviewEntity;
 
 @Repository
 public interface ReviewRepository extends CrudRepository<ReviewEntity, Long> {

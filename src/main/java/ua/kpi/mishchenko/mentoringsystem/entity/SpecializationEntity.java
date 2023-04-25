@@ -1,4 +1,4 @@
-package ua.kpi.mishchenko.mentoringsystem.domain.entity;
+package ua.kpi.mishchenko.mentoringsystem.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,10 +15,10 @@ import java.util.List;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
-@Table(name = "roles")
+@Table(name = "specializations")
 @Setter
 @Getter
-public class RoleEntity {
+public class SpecializationEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -27,6 +27,6 @@ public class RoleEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "role")
-    private List<UserEntity> users = new ArrayList<>();
+    @OneToMany(mappedBy = "specialization")
+    private List<QuestionnaireEntity> questionnaires = new ArrayList<>();
 }

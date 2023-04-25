@@ -3,8 +3,8 @@ package ua.kpi.mishchenko.mentoringsystem.domain.mapper.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.MentoringRequestDTO;
-import ua.kpi.mishchenko.mentoringsystem.domain.entity.MentoringRequestEntity;
 import ua.kpi.mishchenko.mentoringsystem.domain.mapper.Mapper;
+import ua.kpi.mishchenko.mentoringsystem.entity.MentoringRequestEntity;
 
 import java.util.ArrayList;
 import java.util.List;

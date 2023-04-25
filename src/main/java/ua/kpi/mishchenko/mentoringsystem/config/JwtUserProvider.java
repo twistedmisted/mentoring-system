@@ -7,7 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import ua.kpi.mishchenko.mentoringsystem.domain.entity.UserEntity;
+import ua.kpi.mishchenko.mentoringsystem.entity.UserEntity;
 import ua.kpi.mishchenko.mentoringsystem.repository.UserRepository;
 
 import java.util.Collections;

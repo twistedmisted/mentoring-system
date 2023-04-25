@@ -3,9 +3,9 @@ package ua.kpi.mishchenko.mentoringsystem.domain.mapper.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.UserDTO;
-import ua.kpi.mishchenko.mentoringsystem.domain.entity.UserEntity;
 import ua.kpi.mishchenko.mentoringsystem.domain.mapper.Mapper;
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.UserWithPassword;
+import ua.kpi.mishchenko.mentoringsystem.entity.UserEntity;
 import ua.kpi.mishchenko.mentoringsystem.repository.RoleRepository;
 
 import java.util.ArrayList;

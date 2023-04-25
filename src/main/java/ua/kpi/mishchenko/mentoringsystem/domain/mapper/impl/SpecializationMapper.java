@@ -2,8 +2,8 @@ package ua.kpi.mishchenko.mentoringsystem.domain.mapper.impl;
 
 import org.springframework.stereotype.Component;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.SpecializationDTO;
-import ua.kpi.mishchenko.mentoringsystem.domain.entity.SpecializationEntity;
 import ua.kpi.mishchenko.mentoringsystem.domain.mapper.Mapper;
+import ua.kpi.mishchenko.mentoringsystem.entity.SpecializationEntity;
 
 import java.util.List;
 

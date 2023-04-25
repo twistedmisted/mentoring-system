@@ -1,4 +1,4 @@
-package ua.kpi.mishchenko.mentoringsystem.domain.entity;
+package ua.kpi.mishchenko.mentoringsystem.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,10 +15,10 @@ import java.sql.Timestamp;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
-@Table(name = "reviews")
+@Table(name = "messages")
 @Setter
 @Getter
-public class ReviewEntity {
+public class MessageEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -26,9 +26,6 @@ public class ReviewEntity {
 
     @Column(name = "text", nullable = false)
     private String text;
-
-    @Column(name = "rating", nullable = false)
-    private Integer rating;
 
     @Column(name = "created_at", nullable = false)
     private Timestamp createdAt;

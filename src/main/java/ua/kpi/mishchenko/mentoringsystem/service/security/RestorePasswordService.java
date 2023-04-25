@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.PasswordMessageInfo;
-import ua.kpi.mishchenko.mentoringsystem.domain.entity.UserEntity;
+import ua.kpi.mishchenko.mentoringsystem.entity.UserEntity;
 import ua.kpi.mishchenko.mentoringsystem.repository.UserRepository;
 import ua.kpi.mishchenko.mentoringsystem.service.mail.EmailService;
 

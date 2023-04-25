@@ -1,16 +1,13 @@
 package ua.kpi.mishchenko.mentoringsystem.domain.payload;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
-import ua.kpi.mishchenko.mentoringsystem.domain.dto.QuestionnaireDTO;
+import ua.kpi.mishchenko.mentoringsystem.domain.bo.QuestionnaireBO;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.UserStatus;
-
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 @Data
 @Builder
-public class UserWithPhoto {
+public class UserWithQuestionnaire {
 
     private Long id;
     private String name;
@@ -20,10 +17,5 @@ public class UserWithPhoto {
     private String createdAt;
     private String role;
     private double rating;
-
-    @JsonInclude(NON_NULL)
-    private QuestionnaireDTO questionnaire;
-
-    @JsonInclude(NON_NULL)
-    private String profilePhotoUrl;
+    private QuestionnaireBO questionnaire;
 }

@@ -9,8 +9,8 @@ import ua.kpi.mishchenko.mentoringsystem.domain.util.MentoringRequestStatus;
 public class MentoringRequestResponse {
 
     private Long id;
-    private UserWithPhoto from;
-    private UserWithPhoto to;
+    private UserWithQuestionnaire from;
+    private UserWithQuestionnaire to;
     private MentoringRequestStatus status;
     private String createdAt;
     private String updatedAt;

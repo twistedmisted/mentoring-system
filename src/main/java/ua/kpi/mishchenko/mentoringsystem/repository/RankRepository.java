@@ -3,7 +3,7 @@ package ua.kpi.mishchenko.mentoringsystem.repository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
-import ua.kpi.mishchenko.mentoringsystem.domain.entity.RankEntity;
+import ua.kpi.mishchenko.mentoringsystem.entity.RankEntity;
 import ua.kpi.mishchenko.mentoringsystem.repository.projection.RankNameOnly;
 
 import java.util.List;

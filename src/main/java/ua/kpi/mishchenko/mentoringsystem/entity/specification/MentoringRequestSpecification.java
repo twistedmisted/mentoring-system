@@ -1,8 +1,8 @@
-package ua.kpi.mishchenko.mentoringsystem.domain.entity.specification;
+package ua.kpi.mishchenko.mentoringsystem.entity.specification;
 
 import org.springframework.data.jpa.domain.Specification;
-import ua.kpi.mishchenko.mentoringsystem.domain.entity.MentoringRequestEntity;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.MentoringRequestStatus;
+import ua.kpi.mishchenko.mentoringsystem.entity.MentoringRequestEntity;
 
 import static java.util.Objects.isNull;
 

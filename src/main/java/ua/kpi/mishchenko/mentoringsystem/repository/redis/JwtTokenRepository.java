@@ -2,7 +2,7 @@ package ua.kpi.mishchenko.mentoringsystem.repository.redis;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
-import ua.kpi.mishchenko.mentoringsystem.domain.redis.hash.JwtTokenHash;
+import ua.kpi.mishchenko.mentoringsystem.entity.redis.hash.JwtTokenHash;
 
 import java.util.List;
 import java.util.Optional;

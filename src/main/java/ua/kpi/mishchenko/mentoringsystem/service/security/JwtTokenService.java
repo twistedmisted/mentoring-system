@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import ua.kpi.mishchenko.mentoringsystem.domain.redis.hash.JwtTokenHash;
+import ua.kpi.mishchenko.mentoringsystem.entity.redis.hash.JwtTokenHash;
 import ua.kpi.mishchenko.mentoringsystem.repository.redis.JwtTokenRepository;
 import ua.kpi.mishchenko.mentoringsystem.util.Util;
 

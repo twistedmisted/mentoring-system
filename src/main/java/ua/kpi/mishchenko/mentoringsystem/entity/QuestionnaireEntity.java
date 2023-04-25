@@ -1,4 +1,4 @@
-package ua.kpi.mishchenko.mentoringsystem.domain.entity;
+package ua.kpi.mishchenko.mentoringsystem.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -9,6 +9,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,12 +25,15 @@ public class QuestionnaireEntity {
 
     @Id
     @Column(name = "user_id")
+    @NotNull(message = "Необхідно вказати ідентифікатор користувача.")
     private Long userId;
 
     @Column(name = "about", nullable = false)
+    @NotNull(message = "Необхідно заповнити поле про себе.")
     private String about;
 
     @ElementCollection
+    @NotEmpty(message = "Необхідно додати навички.")
     private List<String> skills = new ArrayList<>();
 
     @ElementCollection
@@ -46,6 +51,7 @@ public class QuestionnaireEntity {
     private String linkedin;
 
     @Column(name = "hours_per_week", nullable = false)
+    @NotNull(message = "Необхідно вказати години на тиждень для навчання.")
     private Integer hoursPerWeek;
 
     @OneToOne

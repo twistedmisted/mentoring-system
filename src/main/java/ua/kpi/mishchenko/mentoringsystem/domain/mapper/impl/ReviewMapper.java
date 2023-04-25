@@ -3,8 +3,8 @@ package ua.kpi.mishchenko.mentoringsystem.domain.mapper.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.ReviewDTO;
-import ua.kpi.mishchenko.mentoringsystem.domain.entity.ReviewEntity;
 import ua.kpi.mishchenko.mentoringsystem.domain.mapper.Mapper;
+import ua.kpi.mishchenko.mentoringsystem.entity.ReviewEntity;
 import ua.kpi.mishchenko.mentoringsystem.repository.UserRepository;
 
 import java.util.ArrayList;

@@ -2,8 +2,8 @@ package ua.kpi.mishchenko.mentoringsystem.domain.mapper.impl;
 
 import org.springframework.stereotype.Component;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.RankDTO;
-import ua.kpi.mishchenko.mentoringsystem.domain.entity.RankEntity;
 import ua.kpi.mishchenko.mentoringsystem.domain.mapper.Mapper;
+import ua.kpi.mishchenko.mentoringsystem.entity.RankEntity;
 
 import java.util.ArrayList;
 import java.util.List;
