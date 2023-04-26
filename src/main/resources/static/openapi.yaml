@@ -713,14 +713,14 @@ paths:
                   instance:
                     type: string
                     example: "/api/v1/users/mentees"
-  /api/v1/update-password:
+  /api/v1/users/update-password:
     put:
       tags:
         - User
       summary: Update user password
       requestBody:
         content:
-          multipart/form-data:
+          application/json:
             schema:
               type: object
               properties:

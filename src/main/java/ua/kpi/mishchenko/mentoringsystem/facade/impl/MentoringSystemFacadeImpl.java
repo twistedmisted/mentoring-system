@@ -186,6 +186,7 @@ public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
         PageBO<ReviewBO> reviewPageResult = new PageBO<>(reviewPage.getCurrentPageNumber(), reviewPage.getTotalPages());
         for (ReviewDTO review : reviewPage.getContent()) {
             ReviewBO reviewBO = new ReviewBO();
+            reviewBO.setUserId(review.getFromUser().getId());
             reviewBO.setName(review.getFromUser().getName());
             reviewBO.setSurname(review.getFromUser().getSurname());
             reviewBO.setText(review.getText());

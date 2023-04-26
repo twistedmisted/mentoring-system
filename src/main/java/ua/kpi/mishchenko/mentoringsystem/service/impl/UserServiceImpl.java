@@ -153,10 +153,15 @@ public class UserServiceImpl implements UserService {
         UserEntity userEntity = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Не вдається знайти такого користувчча."));
         String userPassword = userEntity.getPassword();
-        if (!passwordsEqual(passwordRequest.getOldPassword(), userPassword)) {
+        String oldPassword = passwordRequest.getOldPassword();
+        String newPassword = passwordRequest.getNewPassword();
+        if (passwordsEqual(newPassword, userPassword) || newPassword.equals(oldPassword)) {
+            throw new ResponseStatusException(BAD_REQUEST, "Старий та новий паролі не повинні співпадати.");
+        }
+        if (!passwordsEqual(oldPassword, userPassword)) {
             throw new ResponseStatusException(BAD_REQUEST, "Старий пароль введено неправильно.");
         }
-        userEntity.setPassword(passwordEncoder.encode(passwordRequest.getNewPassword()));
+        userEntity.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(userEntity);
         jwtTokenService.invalidateTokenByUserEmail(email);
     }
