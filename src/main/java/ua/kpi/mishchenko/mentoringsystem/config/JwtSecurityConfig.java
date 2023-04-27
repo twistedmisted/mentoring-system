@@ -93,7 +93,8 @@ public class JwtSecurityConfig {
                         API_PATH + "/users/mentees",
                         API_PATH + "/ranks",
                         API_PATH + "/specializations",
-                        API_PATH + "/reviews").permitAll()
+                        API_PATH + "/reviews",
+                        API_PATH + "/auth/validate-token").permitAll()
 //                .requestMatchers(POST, API_PATH + "/recipes").hasRole(USER)
                 .anyRequest().hasAnyAuthority(MENTEE_ROLE, MENTOR_ROLE).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()

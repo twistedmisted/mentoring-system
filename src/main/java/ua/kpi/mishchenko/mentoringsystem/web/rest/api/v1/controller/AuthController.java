@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -77,5 +78,12 @@ public class AuthController {
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("detail", "Новий пароль надіслано на пошту.");
         return new ResponseEntity<>(responseBody, OK);
+    }
+
+    @GetMapping("/validate-token")
+    public boolean validateToken(@RequestHeader(AUTHORIZATION) String authHeader) {
+        log.debug("Token validation");
+        final String token = authHeader.substring(7);
+        return jwtTokenService.validateToken(token);
     }
 }
