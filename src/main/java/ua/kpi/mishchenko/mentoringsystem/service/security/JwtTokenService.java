@@ -50,7 +50,7 @@ public class JwtTokenService {
     }
 
     public String validateTokenAndGetUsername(final String token) {
-        if (!tokenExistsInDb(token)) {
+        if (tokenNotExistsInDb(token)) {
             return null;
         }
         try {
@@ -61,8 +61,20 @@ public class JwtTokenService {
         }
     }
 
-    private boolean tokenExistsInDb(String token) {
-        return jwtTokenRepository.existsByToken(token);
+    public boolean validateToken(String token) {
+        if (tokenNotExistsInDb(token)) {
+            return false;
+        }
+        try {
+            verifier.verify(token);
+            return true;
+        } catch (JWTVerificationException e) {
+            return false;
+        }
+    }
+
+    private boolean tokenNotExistsInDb(String token) {
+        return !jwtTokenRepository.existsByToken(token);
     }
 
     public void invalidateTokenByUserEmail(String email) {

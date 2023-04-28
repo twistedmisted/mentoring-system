@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -18,7 +19,9 @@ import ua.kpi.mishchenko.mentoringsystem.domain.util.UserStatus;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.LAZY;
@@ -66,4 +69,7 @@ public class UserEntity {
 
     @OneToMany(mappedBy = "to", fetch = LAZY)
     private List<MentoringRequestEntity> requestsTo = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "users")
+    private Set<ChatEntity> chats = new HashSet<>();
 }

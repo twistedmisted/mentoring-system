@@ -31,8 +31,8 @@ public class MessageEntity {
     private Timestamp createdAt;
 
     @ManyToOne
-    @JoinColumn(name = "to_user_id", nullable = false)
-    private UserEntity toUser;
+    @JoinColumn(name = "chat_id", nullable = false)
+    private ChatEntity chat;
 
     @ManyToOne
     @JoinColumn(name = "from_user_id", nullable = false)

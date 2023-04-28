@@ -11,12 +11,16 @@ import org.springframework.stereotype.Repository;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.UserStatus;
 import ua.kpi.mishchenko.mentoringsystem.entity.UserEntity;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface UserRepository extends CrudRepository<UserEntity, Long> {
 
     Optional<UserEntity> findByEmail(String email);
+
+    Set<UserEntity> findAllByIdIn(List<Long> ids);
 
     Page<UserEntity> findAll(Specification<UserEntity> specification, Pageable pageable);
 

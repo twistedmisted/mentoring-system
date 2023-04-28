@@ -1,4 +1,8 @@
 CREATE TABLE chats
 (
-    user_id BIGINT
+    id        BIGINT GENERATED ALWAYS AS IDENTITY,
+    created_at TIMESTAMP NOT NULL DEFAULT now()
 );
+
+ALTER TABLE chats
+    ADD CONSTRAINT pk_chats PRIMARY KEY (id);

@@ -9,7 +9,9 @@ import ua.kpi.mishchenko.mentoringsystem.entity.UserEntity;
 import ua.kpi.mishchenko.mentoringsystem.repository.RoleRepository;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static java.util.Objects.isNull;
 
@@ -80,19 +82,14 @@ public class UserMapper implements Mapper<UserEntity, UserDTO> {
         return dtos;
     }
 
-    public UserDTO userWithPasswordToDto(UserWithPassword user) {
-        if (isNull(user)) {
-            return null;
+    public Set<UserDTO> entitiesToDtos(Set<UserEntity> entities) {
+        if (isNull(entities) || entities.isEmpty()) {
+            return new HashSet<>();
         }
-        UserDTO dto = new UserDTO();
-        dto.setId(user.getId());
-        dto.setName(user.getName());
-        dto.setSurname(user.getSurname());
-        dto.setEmail(user.getEmail());
-        dto.setPassword(user.getPassword());
-        dto.setRole(user.getRole());
-        dto.setStatus(user.getStatus());
-        dto.setQuestionnaire(user.getQuestionnaire());
-        return dto;
+        Set<UserDTO> dtos = new HashSet<>();
+        for (UserEntity entity : entities) {
+            dtos.add(entityToDto(entity));
+        }
+        return dtos;
     }
 }

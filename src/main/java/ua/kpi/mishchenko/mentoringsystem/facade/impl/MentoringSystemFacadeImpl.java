@@ -5,10 +5,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
+import ua.kpi.mishchenko.mentoringsystem.domain.bo.ChatBO;
 import ua.kpi.mishchenko.mentoringsystem.domain.bo.MentoringRequestBO;
 import ua.kpi.mishchenko.mentoringsystem.domain.bo.PageBO;
 import ua.kpi.mishchenko.mentoringsystem.domain.bo.QuestionnaireBO;
 import ua.kpi.mishchenko.mentoringsystem.domain.bo.ReviewBO;
+import ua.kpi.mishchenko.mentoringsystem.domain.dto.ChatDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.MediaDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.MentoringRequestDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.QuestionnaireDTO;
@@ -24,18 +27,25 @@ import ua.kpi.mishchenko.mentoringsystem.domain.util.PhotoExtension;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.UserFilter;
 import ua.kpi.mishchenko.mentoringsystem.exception.IllegalPhotoExtensionException;
 import ua.kpi.mishchenko.mentoringsystem.facade.MentoringSystemFacade;
+import ua.kpi.mishchenko.mentoringsystem.repository.projection.PrivateChat;
+import ua.kpi.mishchenko.mentoringsystem.service.ChatService;
 import ua.kpi.mishchenko.mentoringsystem.service.MentoringRequestService;
+import ua.kpi.mishchenko.mentoringsystem.service.MessageService;
 import ua.kpi.mishchenko.mentoringsystem.service.QuestionnaireService;
 import ua.kpi.mishchenko.mentoringsystem.service.ReviewService;
 import ua.kpi.mishchenko.mentoringsystem.service.S3Service;
 import ua.kpi.mishchenko.mentoringsystem.service.UserService;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import static java.util.Objects.isNull;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static ua.kpi.mishchenko.mentoringsystem.domain.util.UserStatus.ACTIVE;
 import static ua.kpi.mishchenko.mentoringsystem.service.impl.S3ServiceImpl.PROFILE_PHOTO;
 import static ua.kpi.mishchenko.mentoringsystem.util.Util.getTimestampNow;
+import static ua.kpi.mishchenko.mentoringsystem.util.Util.parseTimestampToISO8601String;
 import static ua.kpi.mishchenko.mentoringsystem.util.Util.parseTimestampToStringDate;
 
 @Service
@@ -48,6 +58,7 @@ public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
     private final S3Service s3Service;
     private final ReviewService reviewService;
     private final QuestionnaireService questionnaireService;
+    private final ChatService chatService;
 
     @Override
     public UserWithQuestionnaire getUserWithPhotoById(Long userId) {
@@ -162,9 +173,25 @@ public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
     }
 
     @Override
+    @Transactional
     public void acceptMentoringReq(Long reqId, String email) {
         log.debug("Accepting mentoring request by id = [{}]", reqId);
-        mentoringRequestService.acceptMentoringReqStatusById(reqId, email);
+        MentoringRequestDTO mentoringRequestDTO = mentoringRequestService.acceptMentoringReqStatusById(reqId, email);
+        chatService.createChat(createChatForMentoringReq(mentoringRequestDTO));
+    }
+
+    private ChatDTO createChatForMentoringReq(MentoringRequestDTO mentoringRequestDTO) {
+        ChatDTO chat = new ChatDTO();
+        chat.setUsers(getUsersFromMentoringRequest(mentoringRequestDTO));
+        chat.setCreatedAt(getTimestampNow());
+        return chat;
+    }
+
+    private Set<UserDTO> getUsersFromMentoringRequest(MentoringRequestDTO mentoringRequestDTO) {
+        Set<UserDTO> users = new HashSet<>();
+        users.add(mentoringRequestDTO.getFrom());
+        users.add(mentoringRequestDTO.getTo());
+        return users;
     }
 
     @Override
@@ -255,5 +282,40 @@ public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
     public void deleteProfilePhotoByUserEmail(String email) {
         UserDTO user = userService.getUserByEmail(email);
         s3Service.removeUserPhoto(user.getId());
+    }
+
+    @Override
+    public ChatBO getChatById(Long chatId, String reqEmail) {
+        log.debug("Getting chat by id = [{}]", chatId);
+        if (!userHasAccessToChat(chatId, reqEmail)) {
+            throw new ResponseStatusException(FORBIDDEN, "Схоже Ви не маєте доступу до цього чату.");
+        }
+        PrivateChat privateChat = chatService.getChatById(chatId, reqEmail);
+        return createChatBo(privateChat);
+    }
+
+    private boolean userHasAccessToChat(Long chatId, String reqEmail) {
+        return chatService.userHasAccessToChat(chatId, reqEmail);
+    }
+
+    private ChatBO createChatBo(PrivateChat privateChat) {
+        ChatBO chatBo = new ChatBO();
+        chatBo.setId(privateChat.getId());
+        chatBo.setTitle(privateChat.getTitle());
+        chatBo.setPhotoUrl(getProfilePhotoUrlByUserId(privateChat.getToUserId()));
+        chatBo.setLastMessageDate(parseTimestampToISO8601String(privateChat.getLastMessageCreatedAt()));
+        chatBo.setLastMessageText(privateChat.getLastMessageText());
+        return chatBo;
+    }
+
+    @Override
+    public PageBO<ChatBO> getChatsByUserEmail(String email, int numberOfPage) {
+        log.debug("Getting chats by user email = [{}]", email);
+        PageBO<PrivateChat> chatPage = chatService.getChatsByUserEmail(email, numberOfPage);
+        PageBO<ChatBO> resChatPage = new PageBO<>(chatPage.getCurrentPageNumber(), chatPage.getTotalPages());
+        for (PrivateChat privateChat : chatPage.getContent()) {
+            resChatPage.addElement(createChatBo(privateChat));
+        }
+        return resChatPage;
     }
 }

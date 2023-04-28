@@ -1,6 +1,7 @@
 package ua.kpi.mishchenko.mentoringsystem.facade;
 
 import org.springframework.web.multipart.MultipartFile;
+import ua.kpi.mishchenko.mentoringsystem.domain.bo.ChatBO;
 import ua.kpi.mishchenko.mentoringsystem.domain.bo.MentoringRequestBO;
 import ua.kpi.mishchenko.mentoringsystem.domain.bo.PageBO;
 import ua.kpi.mishchenko.mentoringsystem.domain.bo.ReviewBO;
@@ -39,4 +40,8 @@ public interface MentoringSystemFacade {
     void updateUserPasswordByEmail(String email, UpdatePasswordRequest passwordRequest);
 
     void deleteProfilePhotoByUserEmail(String name);
+
+    ChatBO getChatById(Long chatId, String email);
+
+    PageBO<ChatBO> getChatsByUserEmail(String email, int numberOfPage);
 }

@@ -12,6 +12,7 @@ public class Util {
     private static final String ZONE_KYIV = "Europe/Kiev";
     private static final ZoneId ZONE_ID_KYIV = ZoneId.of(ZONE_KYIV);
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
+    private static final DateFormat ISO_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
     public static String generateRandomUuid() {
         return UUID.randomUUID().toString();
@@ -27,5 +28,9 @@ public class Util {
 
     public static String parseTimestampToStringDate(Timestamp timestamp) {
         return DATE_FORMAT.format(timestamp);
+    }
+
+    public static String parseTimestampToISO8601String(Timestamp timestamp) {
+        return ISO_DATE_FORMAT.format(timestamp);
     }
 }

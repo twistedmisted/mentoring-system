@@ -3,13 +3,12 @@ package ua.kpi.mishchenko.mentoringsystem.domain.dto;
 import lombok.Data;
 
 import java.sql.Timestamp;
+import java.util.Set;
 
 @Data
-public class MessageDTO {
+public class ChatDTO {
 
     private Long id;
-    private String text;
-    private Long chatId;
-    private UserDTO fromUser;
     private Timestamp createdAt;
+    private Set<UserDTO> users;
 }

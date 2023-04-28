@@ -11,7 +11,7 @@ public interface MentoringRequestService {
 
     void createMentoringRequest(String fromEmail, MentoringRequestBO mentoringRequest);
 
-    void acceptMentoringReqStatusById(Long reqId, String email);
+    MentoringRequestDTO acceptMentoringReqStatusById(Long reqId, String email);
 
     void rejectMentoringReqStatusById(Long reqId, String email);
 

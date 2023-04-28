@@ -122,19 +122,19 @@ public class MentoringRequestServiceImpl implements MentoringRequestService {
     }
 
     @Override
-    public void acceptMentoringReqStatusById(Long reqId, String email) {
+    public MentoringRequestDTO acceptMentoringReqStatusById(Long reqId, String email) {
         log.debug("Accepting mentoring request by id = [{}]", reqId);
         MentoringRequestEntity mentoringReqEntity = getMentoringRequestEntityById(reqId);
         final MentoringRequestStatus oldStatus = mentoringReqEntity.getStatus();
         final MentoringRequestStatus newStatus = ACCEPTED;
         if (isPending(oldStatus) && statusesNotEquals(oldStatus, newStatus)) {
             if (checkIfUserHasRights(email, mentoringReqEntity.getTo().getEmail())) {
-                updateMentoringRequestStatus(mentoringReqEntity, newStatus);
-                return;
+                return mentoringRequestMapper.entityToDto(updateMentoringRequestStatus(mentoringReqEntity, newStatus));
             }
             logAndThrowForbiddenException("Схоже Ви не маєте прав, щоб прийняти цей запит.");
         }
         logAndThrowProcessedReqException();
+        return null;
     }
 
     @Override
@@ -194,9 +194,10 @@ public class MentoringRequestServiceImpl implements MentoringRequestService {
         return authEmail.equals(reqEmail);
     }
 
-    private void updateMentoringRequestStatus(MentoringRequestEntity mentoringReqEntity, MentoringRequestStatus newStatus) {
+    private MentoringRequestEntity updateMentoringRequestStatus(MentoringRequestEntity mentoringReqEntity, MentoringRequestStatus newStatus) {
         mentoringReqEntity.setStatus(newStatus);
-        mentoringRequestRepository.save(mentoringReqEntity);
+        mentoringReqEntity.setUpdatedAt(getTimestampNow());
+        return mentoringRequestRepository.save(mentoringReqEntity);
     }
 
     private void logAndThrowForbiddenException(String exMessage) {
