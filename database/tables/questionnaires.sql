@@ -4,7 +4,7 @@ CREATE TABLE questionnaires
     about             VARCHAR(1024) NOT NULL,
     rank_id           INT,
     specialization_id INT,
-    linkedin          VARCHAR(256),
+    linkedin          VARCHAR(256)  NOT NULL DEFAULT '',
     hours_per_week    INT           NOT NULL
 );
 
