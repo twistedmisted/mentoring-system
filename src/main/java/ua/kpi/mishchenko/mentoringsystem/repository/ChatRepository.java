@@ -27,7 +27,8 @@ public interface ChatRepository extends CrudRepository<ChatEntity, Long> {
     @Query("SELECT c.id AS id, \n" +
             "       CONCAT(u.surname, ' ', u.name) AS title, \n" +
             "       COALESCE(m.createdAt, c.createdAt) AS lastMessageCreatedAt, \n" +
-            "       COALESCE(m.text, '') AS lastMessageText \n" +
+            "       COALESCE(m.text, '') AS lastMessageText, \n" +
+            "       u.id AS toUserId \n" +
             "FROM ChatEntity c \n" +
             "JOIN c.users u \n" +
             "LEFT JOIN c.messages m ON m.createdAt = (\n" +
@@ -40,8 +41,7 @@ public interface ChatRepository extends CrudRepository<ChatEntity, Long> {
             "    JOIN c.users u \n" +
             "    WHERE u.email = :userEmail\n" +
             ") \n" +
-            "AND u.email != :userEmail \n" +
-            "ORDER BY c.id\n")
+            "AND u.email != :userEmail \n")
     Page<PrivateChat> findAllProjections(String userEmail, Pageable pageable);
 
     @Query("SELECT CASE WHEN COUNT(DISTINCT u.id) = 2 THEN true ELSE false END FROM ChatEntity c " +

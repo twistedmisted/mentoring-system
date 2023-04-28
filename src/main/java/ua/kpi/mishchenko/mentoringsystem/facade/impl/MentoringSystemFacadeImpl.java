@@ -14,6 +14,7 @@ import ua.kpi.mishchenko.mentoringsystem.domain.bo.ReviewBO;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.ChatDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.MediaDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.MentoringRequestDTO;
+import ua.kpi.mishchenko.mentoringsystem.domain.dto.MessageDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.QuestionnaireDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.ReviewDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.UserDTO;
@@ -59,6 +60,7 @@ public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
     private final ReviewService reviewService;
     private final QuestionnaireService questionnaireService;
     private final ChatService chatService;
+    private final MessageService messageService;
 
     @Override
     public UserWithQuestionnaire getUserWithPhotoById(Long userId) {
@@ -317,5 +319,12 @@ public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
             resChatPage.addElement(createChatBo(privateChat));
         }
         return resChatPage;
+    }
+
+    @Override
+    public void getMessagesByChatId(Long chatId, int numberOfPage) {
+        log.debug("Getting messages by chat id = [{}]", chatId);
+        PageBO<MessageDTO> messagePage = messageService.getMessagesByChatId(chatId, numberOfPage);
+
     }
 }

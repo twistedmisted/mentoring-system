@@ -44,4 +44,6 @@ public interface MentoringSystemFacade {
     ChatBO getChatById(Long chatId, String email);
 
     PageBO<ChatBO> getChatsByUserEmail(String email, int numberOfPage);
+
+    void getMessagesByChatId(Long chatId, int numberOfPage);
 }
