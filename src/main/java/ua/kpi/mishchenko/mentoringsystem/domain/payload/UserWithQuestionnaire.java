@@ -1,9 +1,12 @@
 package ua.kpi.mishchenko.mentoringsystem.domain.payload;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
 import ua.kpi.mishchenko.mentoringsystem.domain.bo.QuestionnaireBO;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.UserStatus;
+
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 @Data
 @Builder
@@ -18,4 +21,9 @@ public class UserWithQuestionnaire {
     private String role;
     private double rating;
     private QuestionnaireBO questionnaire;
+
+    @JsonInclude(NON_NULL)
+    private MentoringRequestPayload mentoringRequest;
+
+    private boolean reviewAvailable;
 }

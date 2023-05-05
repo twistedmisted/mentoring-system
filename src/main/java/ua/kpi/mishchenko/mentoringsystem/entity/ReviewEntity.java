@@ -40,4 +40,8 @@ public class ReviewEntity {
     @ManyToOne
     @JoinColumn(name = "from_user_id", nullable = false)
     private UserEntity fromUser;
+
+    @ManyToOne
+    @JoinColumn(name = "mentoring_req_id", nullable = false)
+    private MentoringRequestEntity mentoringRequest;
 }

@@ -1,6 +1,7 @@
 package ua.kpi.mishchenko.mentoringsystem.web.rest.api.v1.handler;
 
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 @ControllerAdvice
+@Slf4j
 public class ValidationHandler extends ResponseEntityExceptionHandler {
 
     private static final String KEY_DETAIL = "detail";
@@ -59,6 +61,7 @@ public class ValidationHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = {RuntimeException.class})
     public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex) {
+        log.info("{}", ex.getCause());
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put(KEY_DETAIL, "Схоже ми маємо деякі проблеми. Спробуйте відправити запит повторно або зачекати. Можливо ми вже вирішуємо цю проблему.");
         return new ResponseEntity<>(responseBody, INTERNAL_SERVER_ERROR);

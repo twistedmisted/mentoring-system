@@ -2,6 +2,7 @@ package ua.kpi.mishchenko.mentoringsystem.util;
 
 import java.sql.Timestamp;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -32,5 +33,13 @@ public class Util {
 
     public static String parseTimestampToISO8601String(Timestamp timestamp) {
         return ISO_DATE_FORMAT.format(timestamp);
+    }
+
+    public static Timestamp ISOStringToTimestamp(String isoDate) {
+        try {
+            return new Timestamp(ISO_DATE_FORMAT.parse(isoDate).getTime());
+        } catch (ParseException e) {
+            throw new RuntimeException("Cannot parse isoDate to Timestamp");
+        }
     }
 }

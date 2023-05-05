@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Data;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.UserStatus;
 
@@ -14,6 +15,7 @@ import java.sql.Timestamp;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 @Data
+@Builder
 public class UserDTO {
 
     private Long id;

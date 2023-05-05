@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.MentoringRequestDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.mapper.Mapper;
 import ua.kpi.mishchenko.mentoringsystem.entity.MentoringRequestEntity;
+import ua.kpi.mishchenko.mentoringsystem.repository.projection.MentoringRequestProjection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,14 +38,25 @@ public class MentoringRequestMapper implements Mapper<MentoringRequestEntity, Me
         if (isNull(entity)) {
             return null;
         }
-        MentoringRequestDTO dto = new MentoringRequestDTO();
-        dto.setId(entity.getId());
-        dto.setFrom(userMapper.entityToDto(entity.getFrom()));
-        dto.setTo(userMapper.entityToDto(entity.getTo()));
-        dto.setStatus(entity.getStatus());
-        dto.setCreatedAt(entity.getCreatedAt());
-        dto.setUpdatedAt(entity.getUpdatedAt());
-        return dto;
+        return MentoringRequestDTO.builder()
+                .id(entity.getId())
+                .from(userMapper.entityToDto(entity.getFrom()))
+                .to(userMapper.entityToDto(entity.getTo()))
+                .status(entity.getStatus())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
+                .build();
+    }
+
+    public MentoringRequestDTO projectionToDto(MentoringRequestProjection projection) {
+        if (isNull(projection)) {
+            return null;
+        }
+        return MentoringRequestDTO.builder()
+                .id(projection.getId())
+                .from(userMapper.projectionToDto(projection.getFromUser()))
+                .status(projection.getStatus())
+                .build();
     }
 
     @Override

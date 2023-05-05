@@ -18,6 +18,7 @@ import static java.util.Objects.isNull;
 public class MessageMapper implements Mapper<MessageEntity, MessageDTO> {
 
     private final ChatRepository chatRepository;
+    private final UserRepository userRepository;
     private final UserMapper userMapper;
 
     @Override
@@ -29,7 +30,8 @@ public class MessageMapper implements Mapper<MessageEntity, MessageDTO> {
         entity.setId(dto.getId());
         entity.setText(dto.getText());
         entity.setCreatedAt(dto.getCreatedAt());
-        entity.setFromUser(userMapper.dtoToEntity(dto.getFromUser()));
+        entity.setStatus(dto.getStatus());
+        entity.setFromUser(userRepository.findByEmail(dto.getFromUser().getEmail()).get());
         entity.setChat(chatRepository.findById(dto.getChatId()).get());
         return entity;
     }
@@ -43,6 +45,7 @@ public class MessageMapper implements Mapper<MessageEntity, MessageDTO> {
         dto.setId(entity.getId());
         dto.setText(entity.getText());
         dto.setCreatedAt(entity.getCreatedAt());
+        dto.setStatus(entity.getStatus());
         dto.setFromUser(userMapper.entityToDto(entity.getFromUser()));
         dto.setChatId(entity.getChat().getId());
         return dto;

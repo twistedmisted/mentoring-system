@@ -34,8 +34,10 @@ public class QuestionnaireController {
                                                  @RequestPart(value = "photo", required = false)
                                                  MultipartFile photo,
                                                  Principal principal) {
-        log.debug("Updating questionnaire for user with email = [{}]", principal.getName());
-        UserWithQuestionnaire user = mentoringSystemFacade.updateQuestionnaireByUserEmail(principal.getName(), questionnaire, photo);
+        String userEmail = principal.getName();
+        log.debug("Updating questionnaire for user with email = [{}]", userEmail);
+        mentoringSystemFacade.updateQuestionnaireByUserEmail(userEmail, questionnaire, photo);
+        UserWithQuestionnaire user = mentoringSystemFacade.getUserByEmail(userEmail);
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("user", user);
         return new ResponseEntity<>(responseBody, OK);

@@ -6,6 +6,8 @@ import ua.kpi.mishchenko.mentoringsystem.domain.dto.ChatDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.UserDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.mapper.Mapper;
 import ua.kpi.mishchenko.mentoringsystem.entity.ChatEntity;
+import ua.kpi.mishchenko.mentoringsystem.entity.MentoringRequestEntity;
+import ua.kpi.mishchenko.mentoringsystem.repository.MentoringRequestRepository;
 import ua.kpi.mishchenko.mentoringsystem.repository.UserRepository;
 
 import java.util.ArrayList;
@@ -17,6 +19,7 @@ import static java.util.Objects.isNull;
 @RequiredArgsConstructor
 public class ChatMapper implements Mapper<ChatEntity, ChatDTO> {
 
+    private final MentoringRequestRepository mentoringRequestRepository;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
@@ -27,8 +30,10 @@ public class ChatMapper implements Mapper<ChatEntity, ChatDTO> {
         }
         ChatEntity entity = new ChatEntity();
         entity.setId(dto.getId());
+        entity.setStatus(dto.getStatus());
         entity.setCreatedAt(dto.getCreatedAt());
         entity.setUsers(userRepository.findAllByIdIn(dto.getUsers().stream().map(UserDTO::getId).toList()));
+        entity.addMentoringRequests(mentoringRequestRepository.findAllByIdIn(dto.getMentoringReqIds()));
         return entity;
     }
 
@@ -39,6 +44,8 @@ public class ChatMapper implements Mapper<ChatEntity, ChatDTO> {
         }
         ChatDTO dto = new ChatDTO();
         dto.setId(entity.getId());
+        dto.setMentoringReqIds(entity.getMentoringRequests().stream().map(MentoringRequestEntity::getId).toList());
+        dto.setStatus(entity.getStatus());
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setUsers(userMapper.entitiesToDtos(entity.getUsers()));
         return dto;

@@ -8,13 +8,16 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.MentoringRequestStatus;
 
 import java.sql.Timestamp;
+import java.util.List;
 
+import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -44,4 +47,11 @@ public class MentoringRequestEntity {
 
     @Column(name = "updated_at", nullable = false)
     private Timestamp updatedAt;
+
+    @OneToMany(mappedBy = "mentoringRequest", cascade = ALL)
+    private List<ReviewEntity> reviews;
+
+    @ManyToOne
+    @JoinColumn(name = "chat_id")
+    private ChatEntity chat;
 }

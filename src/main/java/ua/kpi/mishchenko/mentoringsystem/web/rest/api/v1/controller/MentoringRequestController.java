@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import ua.kpi.mishchenko.mentoringsystem.domain.bo.MentoringRequestBO;
 import ua.kpi.mishchenko.mentoringsystem.domain.bo.PageBO;
-import ua.kpi.mishchenko.mentoringsystem.domain.payload.MentoringRequestResponse;
+import ua.kpi.mishchenko.mentoringsystem.domain.payload.MentoringRequestPayload;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.MentoringRequestFilter;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.MentoringRequestStatus;
 import ua.kpi.mishchenko.mentoringsystem.facade.MentoringSystemFacade;
@@ -27,7 +27,6 @@ import java.util.Map;
 import static java.util.Objects.isNull;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 @RestController
@@ -69,7 +68,7 @@ public class MentoringRequestController {
     }
 
     private Map<String, Object> getMentoringReqPageByFilter(MentoringRequestFilter filter, int numberOfPage) {
-        PageBO<MentoringRequestResponse> mentoringRequestsPage = mentoringSystemFacade.getMentoringRequests(filter, numberOfPage);
+        PageBO<MentoringRequestPayload> mentoringRequestsPage = mentoringSystemFacade.getMentoringRequests(filter, numberOfPage);
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("page", mentoringRequestsPage);
         return responseBody;
@@ -94,31 +93,49 @@ public class MentoringRequestController {
     public ResponseEntity<Map<String, Object>> createMentoringRequest(@Valid @RequestBody MentoringRequestBO mentoringRequest,
                                                                       Principal principal) {
         log.debug("Creating new mentoring request");
-        mentoringSystemFacade.createMentoringRequest(principal.getName(), mentoringRequest);
-        return new ResponseEntity<>(CREATED);
+        MentoringRequestPayload createdRequest = mentoringSystemFacade.createMentoringRequest(principal.getName(), mentoringRequest);
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("mentoringRequest", createdRequest);
+        return new ResponseEntity<>(responseBody, CREATED);
     }
 
     @PutMapping("/accept/{reqId}")
     public ResponseEntity<Map<String, Object>> acceptMentoringRequest(@PathVariable Long reqId,
                                                                       Principal principal) {
         log.debug("Approving mentoring request by id = [{}]", reqId);
-        mentoringSystemFacade.acceptMentoringReq(reqId, principal.getName());
-        return new ResponseEntity<>(NO_CONTENT);
+        MentoringRequestPayload mentoringReq = mentoringSystemFacade.acceptMentoringReq(reqId, principal.getName());
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("mentoringRequest", mentoringReq);
+        return new ResponseEntity<>(responseBody, OK);
     }
 
     @PutMapping("/reject/{reqId}")
     public ResponseEntity<Map<String, Object>> rejectMentoringRequest(@PathVariable Long reqId,
                                                                       Principal principal) {
         log.debug("Rejecting mentoring request by id = [{}]", reqId);
-        mentoringSystemFacade.rejectMentoringReq(reqId, principal.getName());
-        return new ResponseEntity<>(NO_CONTENT);
+        MentoringRequestPayload mentoringReq = mentoringSystemFacade.rejectMentoringReq(reqId, principal.getName());
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("mentoringRequest", mentoringReq);
+        return new ResponseEntity<>(responseBody, OK);
     }
 
     @PutMapping("/cancel/{reqId}")
     public ResponseEntity<Map<String, Object>> cancelMentoringRequest(@PathVariable Long reqId,
                                                                       Principal principal) {
         log.debug("Canceling mentoring request by id = [{}]", reqId);
-        mentoringSystemFacade.cancelMentoringReq(reqId, principal.getName());
-        return new ResponseEntity<>(NO_CONTENT);
+        MentoringRequestPayload mentoringReq = mentoringSystemFacade.cancelMentoringReq(reqId, principal.getName());
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("mentoringRequest", mentoringReq);
+        return new ResponseEntity<>(responseBody, OK);
+    }
+
+    @PutMapping("/finish/{reqId}")
+    public ResponseEntity<Map<String, Object>> finishMentoringRequest(@PathVariable Long reqId,
+                                                                      Principal principal) {
+        log.debug("Finishing mentoring request by id = [{}]", reqId);
+        MentoringRequestPayload mentoringReq = mentoringSystemFacade.finishMentoringReq(reqId, principal.getName());
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("mentoringRequest", mentoringReq);
+        return new ResponseEntity<>(responseBody, OK);
     }
 }

@@ -1,5 +1,7 @@
 package ua.kpi.mishchenko.mentoringsystem.repository.projection;
 
+import ua.kpi.mishchenko.mentoringsystem.domain.util.ChatStatus;
+
 import java.sql.Timestamp;
 
 public interface PrivateChat {
@@ -13,4 +15,8 @@ public interface PrivateChat {
     Long getToUserId();
 
     String getLastMessageText();
+
+    Integer getUnreadMessages();
+
+    ChatStatus getStatus();
 }

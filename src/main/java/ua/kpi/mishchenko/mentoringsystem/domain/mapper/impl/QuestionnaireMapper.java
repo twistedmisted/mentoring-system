@@ -37,6 +37,9 @@ public class QuestionnaireMapper implements Mapper<QuestionnaireEntity, Question
         entity.setLinkedin(dto.getLinkedin());
         entity.setHoursPerWeek(dto.getHoursPerWeek());
         entity.setUser(userRepository.findById(dto.getUserId()).get());
+//        if (isNull(entity.getUser().getQuestionnaire())) {
+//            entity.getUser().setQuestionnaire(entity);
+//        }
         return entity;
     }
 

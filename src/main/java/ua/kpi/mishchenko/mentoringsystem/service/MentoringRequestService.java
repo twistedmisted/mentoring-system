@@ -7,13 +7,19 @@ import ua.kpi.mishchenko.mentoringsystem.domain.util.MentoringRequestFilter;
 
 public interface MentoringRequestService {
 
+    MentoringRequestDTO getMentoringRequestByUsers(Long firstUserId, String secondUserEmail);
+
     PageBO<MentoringRequestDTO> getMentoringRequests(MentoringRequestFilter filter, int numberOfPage);
 
-    void createMentoringRequest(String fromEmail, MentoringRequestBO mentoringRequest);
+    MentoringRequestDTO createMentoringRequest(String fromEmail, MentoringRequestBO mentoringRequest);
 
     MentoringRequestDTO acceptMentoringReqStatusById(Long reqId, String email);
 
-    void rejectMentoringReqStatusById(Long reqId, String email);
+    MentoringRequestDTO rejectMentoringReqStatusById(Long reqId, String email);
 
-    void cancelMentoringReqStatusById(Long reqId, String email);
+    MentoringRequestDTO cancelMentoringReqStatusById(Long reqId, String email);
+
+    MentoringRequestDTO finishMentoringReqStatusById(Long reqId, String email);
+
+    boolean checkIfUserHasPendingReqs(String userEmail);
 }

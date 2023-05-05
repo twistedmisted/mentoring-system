@@ -1,5 +1,6 @@
 package ua.kpi.mishchenko.mentoringsystem.repository;
 
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -10,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.UserStatus;
 import ua.kpi.mishchenko.mentoringsystem.entity.UserEntity;
+import ua.kpi.mishchenko.mentoringsystem.repository.projection.UserEmailProjection;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +30,16 @@ public interface UserRepository extends CrudRepository<UserEntity, Long> {
 
     boolean existsByIdAndEmail(Long id, String email);
 
-    @Modifying
+    @Transactional
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE UserEntity e SET e.status = :status WHERE e.id = :id")
     void updateStatusByUserId(@Param(value = "id") Long userId, @Param(value = "status") UserStatus status);
+
+    @Query("SELECT u.email AS email " +
+            "FROM UserEntity u " +
+            "JOIN u.chats c " +
+            "WHERE c.id = :chatId")
+    List<UserEmailProjection> findAllUserEmailsByChatId(Long chatId);
+
+    List<UserEmailProjection> findAllByEmailNotAndChatsId(String email, Long chatId);
 }

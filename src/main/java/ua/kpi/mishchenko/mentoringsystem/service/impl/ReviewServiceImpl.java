@@ -8,18 +8,20 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ua.kpi.mishchenko.mentoringsystem.domain.bo.PageBO;
+import ua.kpi.mishchenko.mentoringsystem.domain.dto.MentoringRequestDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.ReviewDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.mapper.impl.ReviewMapper;
 import ua.kpi.mishchenko.mentoringsystem.entity.ReviewEntity;
 import ua.kpi.mishchenko.mentoringsystem.repository.MentoringRequestRepository;
 import ua.kpi.mishchenko.mentoringsystem.repository.ReviewRepository;
+import ua.kpi.mishchenko.mentoringsystem.repository.projection.MentoringReqIdAndExistsReview;
 import ua.kpi.mishchenko.mentoringsystem.service.ReviewService;
 
 import java.util.List;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static ua.kpi.mishchenko.mentoringsystem.domain.util.MentoringRequestStatus.ACCEPTED;
+import static ua.kpi.mishchenko.mentoringsystem.domain.util.MentoringRequestStatus.FINISHED;
 
 @Service
 @RequiredArgsConstructor
@@ -55,28 +57,38 @@ public class ReviewServiceImpl implements ReviewService {
         Long fromUserId = reviewDto.getFromUser().getId();
         if (toUserId.equals(fromUserId)) {
             log.debug("Cannot write comment to self");
-            throw new ResponseStatusException(BAD_REQUEST, "Ви не можете писати коментарій самому собі.");
+            throw new ResponseStatusException(BAD_REQUEST, "Ви не можете писати відгук самому собі.");
         }
-        if (existsByToUserIdAndFromUserId(toUserId, fromUserId)) {
-            log.debug("Cannot create review because it already exists");
-            throw new ResponseStatusException(BAD_REQUEST, "Ви можете писати лише 1 коментарій для 1 користувача.");
-        }
-        if (canWriteReview(toUserId, fromUserId)) {
+        if (!existsMentoringReqByUsersAndFinishedStatus(fromUserId, toUserId)) {
             log.debug("Cannot create review because users do not have connections");
             throw new ResponseStatusException(BAD_REQUEST,
                     "Не можливо написати відгук користувачу, " +
-                            "оскільки Ви не мали з ним жодних завершених менторських зв'язків.");
+                            "оскільки Ви не мали з ним жодних завершених співпраць.");
         }
+        MentoringReqIdAndExistsReview lastFinishedMentoringReq =
+                mentoringRequestRepository.findLastFinishedMentoringReqIdAndExistsReview(fromUserId, toUserId);
+        if (!lastFinishedMentoringReq.getExistsReview()) {
+            log.debug("Cannot create review for the last mentoring request because it already exists");
+            throw new ResponseStatusException(BAD_REQUEST, "Ви можете писати лише 1 коментарій до останньої співпраці з цїєю людиною.");
+        }
+        reviewDto.setMentoringRequest(MentoringRequestDTO.builder().id(lastFinishedMentoringReq.getId()).build());
         reviewRepository.save(reviewMapper.dtoToEntity(reviewDto));
     }
 
-    private boolean canWriteReview(Long toUserId, Long fromUserId) {
-        return mentoringRequestRepository.existsByToIdAndFromIdAndStatus(toUserId, fromUserId, ACCEPTED)
-                && mentoringRequestRepository.existsByToIdAndFromIdAndStatus(fromUserId, toUserId, ACCEPTED);
+    @Override
+    public boolean checkIfUserCanWriteReview(String fromUserEmail, Long toUserId) {
+        if (!existsMentoringReqByUsersAndFinishedStatus(fromUserEmail, toUserId)) {
+            return false;
+        }
+        return reviewRepository.checkIfUserCanWriteReview(fromUserEmail, toUserId);
     }
 
-    private boolean existsByToUserIdAndFromUserId(Long toUserId, Long fromUserId) {
-        return reviewRepository.existsByToUserIdAndFromUserId(toUserId, fromUserId);
+    private boolean existsMentoringReqByUsersAndFinishedStatus(Long fromUserId, Long toUserId) {
+        return mentoringRequestRepository.existsByTwoUsersAndStatus(fromUserId, toUserId, FINISHED);
+    }
+
+    private boolean existsMentoringReqByUsersAndFinishedStatus(String fromUserEmail, Long toUserId) {
+        return mentoringRequestRepository.existsByTwoUsersAndStatus(toUserId, fromUserEmail, FINISHED);
     }
 
     @Override

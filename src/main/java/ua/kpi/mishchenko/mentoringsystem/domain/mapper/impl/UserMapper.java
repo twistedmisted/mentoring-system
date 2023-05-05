@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.UserDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.mapper.Mapper;
-import ua.kpi.mishchenko.mentoringsystem.domain.payload.UserWithPassword;
 import ua.kpi.mishchenko.mentoringsystem.entity.UserEntity;
 import ua.kpi.mishchenko.mentoringsystem.repository.RoleRepository;
+import ua.kpi.mishchenko.mentoringsystem.repository.projection.RequestUserProjection;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -45,17 +45,28 @@ public class UserMapper implements Mapper<UserEntity, UserDTO> {
         if (isNull(entity)) {
             return null;
         }
-        UserDTO dto = new UserDTO();
-        dto.setId(entity.getId());
-        dto.setName(entity.getName());
-        dto.setSurname(entity.getSurname());
-        dto.setEmail(entity.getEmail());
-        dto.setPassword(entity.getPassword());
-        dto.setStatus(entity.getStatus());
-        dto.setCreatedAt(entity.getCreatedAt());
-        dto.setRole(entity.getRole().getName());
-        dto.setQuestionnaire(questionnaireMapper.entityToDto(entity.getQuestionnaire()));
-        return dto;
+        return UserDTO.builder()
+                .id(entity.getId())
+                .name(entity.getName())
+                .surname(entity.getSurname())
+                .email(entity.getEmail())
+                .password(entity.getPassword())
+                .status(entity.getStatus())
+                .createdAt(entity.getCreatedAt())
+                .role(entity.getRole().getName())
+                .questionnaire(questionnaireMapper.entityToDto(entity.getQuestionnaire()))
+                .build();
+    }
+
+    public UserDTO projectionToDto(RequestUserProjection projection) {
+        if (isNull(projection)) {
+            return null;
+        }
+        return UserDTO.builder()
+                .id(projection.getId())
+                .name(projection.getName())
+                .surname(projection.getSurname())
+                .build();
     }
 
     @Override

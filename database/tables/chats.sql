@@ -1,7 +1,8 @@
 CREATE TABLE chats
 (
-    id        BIGINT GENERATED ALWAYS AS IDENTITY,
-    created_at TIMESTAMP NOT NULL DEFAULT now()
+    id         BIGINT GENERATED ALWAYS AS IDENTITY,
+    status     VARCHAR(30) NOT NULL DEFAULT 'ACTIVE',
+    created_at TIMESTAMP   NOT NULL DEFAULT now()
 );
 
 ALTER TABLE chats

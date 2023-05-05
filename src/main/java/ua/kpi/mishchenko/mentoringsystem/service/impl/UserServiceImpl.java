@@ -9,24 +9,22 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ua.kpi.mishchenko.mentoringsystem.domain.bo.PageBO;
-import ua.kpi.mishchenko.mentoringsystem.domain.dto.QuestionnaireDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.UserDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.mapper.impl.UserMapper;
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.UpdatePasswordRequest;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.UserFilter;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.UserStatus;
-import ua.kpi.mishchenko.mentoringsystem.entity.RankEntity;
-import ua.kpi.mishchenko.mentoringsystem.entity.SpecializationEntity;
 import ua.kpi.mishchenko.mentoringsystem.entity.UserEntity;
 import ua.kpi.mishchenko.mentoringsystem.repository.RankRepository;
 import ua.kpi.mishchenko.mentoringsystem.repository.SpecializationRepository;
 import ua.kpi.mishchenko.mentoringsystem.repository.UserRepository;
+import ua.kpi.mishchenko.mentoringsystem.repository.projection.UserEmailProjection;
 import ua.kpi.mishchenko.mentoringsystem.service.UserService;
 import ua.kpi.mishchenko.mentoringsystem.service.security.JwtTokenService;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import static java.util.Objects.isNull;
 import static org.springframework.data.jpa.domain.Specification.where;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -100,35 +98,12 @@ public class UserServiceImpl implements UserService {
         return userRepository.existsById(userId);
     }
 
-    private boolean existsByEmail(String email) {
-        return userRepository.existsByEmail(email);
-    }
-
-    private boolean valuesNotEqual(String oldEmail, String newEmail) {
-        return !oldEmail.equals(newEmail);
-    }
-
-    private SpecializationEntity getSpecializationEntity(QuestionnaireDTO questionnaire) {
-        return specializationRepository.findByName(questionnaire.getSpecialization()).get();
-    }
-
-    private RankEntity getRankEntity(QuestionnaireDTO questionnaire) {
-        return rankRepository.findByName(questionnaire.getRank()).get();
-    }
-
-    private boolean valueExists(Object value) {
-        if (isNull(value)) {
-            return false;
-        }
-        if (value instanceof String) {
-            return !((String) value).isBlank();
-        }
-        return true;
-    }
-
     @Override
-    public boolean existsByIdAndEmail(Long id, String email) {
-        return userRepository.existsByIdAndEmail(id, email);
+    public List<String> getUsersEmailsFromChatByIdExceptSender(Long chatId, String senderEmail) {
+        log.debug("Getting users from chat with id = [{}]", chatId);
+        return userRepository.findAllByEmailNotAndChatsId(senderEmail, chatId).stream()
+                .map(UserEmailProjection::getEmail)
+                .toList();
     }
 
     @Override
@@ -168,5 +143,17 @@ public class UserServiceImpl implements UserService {
 
     private boolean passwordsEqual(String oldPassword, String userPassword) {
         return passwordEncoder.matches(oldPassword, userPassword);
+    }
+
+    @Override
+    public List<String> getAllChatUsersByChatId(Long chatId) {
+        log.debug("Getting all chat users by chat id = [{}]", chatId);
+        List<UserEmailProjection> userEmailsByChatId = userRepository.findAllUserEmailsByChatId(chatId);
+        if (userEmailsByChatId.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return userEmailsByChatId.stream()
+                .map(UserEmailProjection::getEmail)
+                .toList();
     }
 }

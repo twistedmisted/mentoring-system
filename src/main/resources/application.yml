@@ -40,3 +40,8 @@ springdoc:
     tags-sorter: alpha
     operations-sorter: method
     url: /openapi.yaml
+
+logging:
+  level:
+    org.hibernate:
+      sql: debug

@@ -13,4 +13,5 @@ public class ReviewDTO {
     private Timestamp createdAt;
     private UserDTO fromUser;
     private UserDTO toUser;
+    private MentoringRequestDTO mentoringRequest;
 }

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.ReviewDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.mapper.Mapper;
 import ua.kpi.mishchenko.mentoringsystem.entity.ReviewEntity;
+import ua.kpi.mishchenko.mentoringsystem.repository.MentoringRequestRepository;
 import ua.kpi.mishchenko.mentoringsystem.repository.UserRepository;
 
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import static java.util.Objects.isNull;
 public class ReviewMapper implements Mapper<ReviewEntity, ReviewDTO> {
 
     private final UserRepository userRepository;
+    private final MentoringRequestRepository mentoringRequestRepository;
     private final UserMapper userMapper;
 
     @Override
@@ -31,6 +33,7 @@ public class ReviewMapper implements Mapper<ReviewEntity, ReviewDTO> {
         entity.setCreatedAt(dto.getCreatedAt());
         entity.setToUser(userRepository.findById(dto.getToUser().getId()).get());
         entity.setFromUser(userRepository.findById(dto.getFromUser().getId()).get());
+        entity.setMentoringRequest(mentoringRequestRepository.findById(dto.getMentoringRequest().getId()).get());
         return entity;
     }
 

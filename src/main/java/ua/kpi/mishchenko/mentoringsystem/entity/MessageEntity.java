@@ -2,17 +2,17 @@ package ua.kpi.mishchenko.mentoringsystem.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+import ua.kpi.mishchenko.mentoringsystem.domain.util.MessageStatus;
 
 import java.sql.Timestamp;
-
-import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Table(name = "messages")
@@ -21,7 +21,6 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 public class MessageEntity {
 
     @Id
-    @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
     @Column(name = "text", nullable = false)
@@ -29,6 +28,10 @@ public class MessageEntity {
 
     @Column(name = "created_at", nullable = false)
     private Timestamp createdAt;
+
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private MessageStatus status;
 
     @ManyToOne
     @JoinColumn(name = "chat_id", nullable = false)

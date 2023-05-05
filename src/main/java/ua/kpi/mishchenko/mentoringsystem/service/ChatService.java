@@ -10,7 +10,11 @@ public interface ChatService {
 
     PageBO<PrivateChat> getChatsByUserEmail(String email, int numberOfPage);
 
-    void createChat(ChatDTO chat);
+    ChatDTO createChat(ChatDTO chat);
 
     boolean userHasAccessToChat(Long chatId, String reqEmail);
+
+    void archiveChatByMentoringReqId(Long reqId);
+
+    boolean isArchived(Long chatId);
 }

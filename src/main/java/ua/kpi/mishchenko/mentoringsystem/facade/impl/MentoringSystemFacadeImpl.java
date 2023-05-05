@@ -3,10 +3,15 @@ package ua.kpi.mishchenko.mentoringsystem.facade.impl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.MessageHeaders;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.SimpMessageType;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.user.SimpSession;
+import org.springframework.messaging.simp.user.SimpSubscription;
+import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
-import ua.kpi.mishchenko.mentoringsystem.domain.bo.ChatBO;
 import ua.kpi.mishchenko.mentoringsystem.domain.bo.MentoringRequestBO;
 import ua.kpi.mishchenko.mentoringsystem.domain.bo.PageBO;
 import ua.kpi.mishchenko.mentoringsystem.domain.bo.QuestionnaireBO;
@@ -14,39 +19,40 @@ import ua.kpi.mishchenko.mentoringsystem.domain.bo.ReviewBO;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.ChatDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.MediaDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.MentoringRequestDTO;
-import ua.kpi.mishchenko.mentoringsystem.domain.dto.MessageDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.QuestionnaireDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.ReviewDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.UserDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.CreateReviewRequest;
-import ua.kpi.mishchenko.mentoringsystem.domain.payload.MentoringRequestResponse;
+import ua.kpi.mishchenko.mentoringsystem.domain.payload.MentoringRequestPayload;
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.QuestionnaireUpdateRequest;
+import ua.kpi.mishchenko.mentoringsystem.domain.payload.RequestUser;
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.UpdatePasswordRequest;
 import ua.kpi.mishchenko.mentoringsystem.domain.payload.UserWithQuestionnaire;
+import ua.kpi.mishchenko.mentoringsystem.domain.util.ChatStatus;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.MentoringRequestFilter;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.PhotoExtension;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.UserFilter;
 import ua.kpi.mishchenko.mentoringsystem.exception.IllegalPhotoExtensionException;
+import ua.kpi.mishchenko.mentoringsystem.facade.ChatSystemFacade;
 import ua.kpi.mishchenko.mentoringsystem.facade.MentoringSystemFacade;
-import ua.kpi.mishchenko.mentoringsystem.repository.projection.PrivateChat;
+import ua.kpi.mishchenko.mentoringsystem.facade.NotificationSystemFacade;
 import ua.kpi.mishchenko.mentoringsystem.service.ChatService;
 import ua.kpi.mishchenko.mentoringsystem.service.MentoringRequestService;
-import ua.kpi.mishchenko.mentoringsystem.service.MessageService;
 import ua.kpi.mishchenko.mentoringsystem.service.QuestionnaireService;
 import ua.kpi.mishchenko.mentoringsystem.service.ReviewService;
 import ua.kpi.mishchenko.mentoringsystem.service.S3Service;
 import ua.kpi.mishchenko.mentoringsystem.service.UserService;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static java.util.Objects.isNull;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static ua.kpi.mishchenko.mentoringsystem.domain.util.UserStatus.ACTIVE;
 import static ua.kpi.mishchenko.mentoringsystem.service.impl.S3ServiceImpl.PROFILE_PHOTO;
 import static ua.kpi.mishchenko.mentoringsystem.util.Util.getTimestampNow;
-import static ua.kpi.mishchenko.mentoringsystem.util.Util.parseTimestampToISO8601String;
 import static ua.kpi.mishchenko.mentoringsystem.util.Util.parseTimestampToStringDate;
 
 @Service
@@ -54,13 +60,18 @@ import static ua.kpi.mishchenko.mentoringsystem.util.Util.parseTimestampToString
 @Slf4j
 public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
 
+    private static final String QUEUE_MENTORING_REQ_DESTINATION = "/queue/mentoring-requests";
+
     private final UserService userService;
     private final MentoringRequestService mentoringRequestService;
     private final S3Service s3Service;
     private final ReviewService reviewService;
     private final QuestionnaireService questionnaireService;
     private final ChatService chatService;
-    private final MessageService messageService;
+    private final ChatSystemFacade chatSystemFacade;
+
+    private final SimpMessagingTemplate simpMessagingTemplate;
+    private final SimpUserRegistry simpUserRegistry;
 
     @Override
     public UserWithQuestionnaire getUserWithPhotoById(Long userId) {
@@ -143,47 +154,85 @@ public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
     }
 
     @Override
-    public PageBO<MentoringRequestResponse> getMentoringRequests(MentoringRequestFilter filter, int numberOfPage) {
+    public PageBO<MentoringRequestPayload> getMentoringRequests(MentoringRequestFilter filter, int numberOfPage) {
         PageBO<MentoringRequestDTO> mentoringReqPage = mentoringRequestService.getMentoringRequests(filter, numberOfPage);
-        PageBO<MentoringRequestResponse> mentoringReqResult = new PageBO<>(mentoringReqPage.getCurrentPageNumber(),
+        PageBO<MentoringRequestPayload> mentoringReqResult = new PageBO<>(mentoringReqPage.getCurrentPageNumber(),
                 mentoringReqPage.getTotalPages());
         for (MentoringRequestDTO mentoringReqDto : mentoringReqPage.getContent()) {
-            String fromPhotoUrl = getProfilePhotoUrlByUserId(mentoringReqDto.getFrom().getId());
-            String toPhotoUrl = getProfilePhotoUrlByUserId(mentoringReqDto.getTo().getId());
-            mentoringReqResult.addElement(createMentoringReqResponse(mentoringReqDto, fromPhotoUrl, toPhotoUrl));
+            mentoringReqResult.addElement(createMentoringReqPayload(mentoringReqDto));
         }
         return mentoringReqResult;
     }
 
-    private MentoringRequestResponse createMentoringReqResponse(MentoringRequestDTO mentoringReqDto, String fromPhotoUrl, String toPhotoUrl) {
-        return MentoringRequestResponse.builder()
-                .id(mentoringReqDto.getId())
-                .from(createUserWithPhoto(mentoringReqDto.getFrom(), fromPhotoUrl))
-                .to(createUserWithPhoto(mentoringReqDto.getTo(), toPhotoUrl))
-                .status(mentoringReqDto.getStatus())
-                .createdAt(parseTimestampToStringDate(mentoringReqDto.getCreatedAt()))
-                .updatedAt(parseTimestampToStringDate(mentoringReqDto.getUpdatedAt()))
-                .build();
-    }
+    private final NotificationSystemFacade notificationSystemFacade;
 
     @Override
     @Transactional
-    public void createMentoringRequest(String fromEmail, MentoringRequestBO mentoringRequest) {
+    public MentoringRequestPayload createMentoringRequest(String fromEmail, MentoringRequestBO mentoringRequest) {
         log.debug("Creating new mentoring request");
-        mentoringRequestService.createMentoringRequest(fromEmail, mentoringRequest);
-        // TODO: send push notification
+        MentoringRequestDTO mentoringRequestDTO = mentoringRequestService.createMentoringRequest(fromEmail, mentoringRequest);
+        MentoringRequestPayload mentoringReqPayload = createMentoringReqPayload(mentoringRequestDTO);
+        sendMentoringReqUpdate(mentoringReqPayload, Arrays.asList(mentoringRequestDTO.getTo().getEmail(),
+                mentoringRequestDTO.getFrom().getEmail()));
+        notificationSystemFacade.sendNotificationByUserEmail(mentoringRequestDTO.getTo().getEmail(), "Ви отримали новий запит на менторство.");
+        return mentoringReqPayload;
     }
 
+    private void sendMentoringReqUpdate(MentoringRequestPayload mentoringReqPayload, List<String> mentoringReqUsersEmails) {
+        Set<SimpSubscription> chatsSubs = findSubsByDestinationEndWith(QUEUE_MENTORING_REQ_DESTINATION);
+        chatsSubs.stream()
+                .filter(s -> mentoringReqUsersEmails.contains(s.getSession().getUser().getName()))
+                .forEach(s -> createAndSendMentoringReqUpdate(s.getSession(), mentoringReqPayload));
+    }
+
+    private Set<SimpSubscription> findSubsByDestinationEndWith(String endWith) {
+        return simpUserRegistry.findSubscriptions(s -> s.getDestination().endsWith(endWith));
+    }
+
+    private void createAndSendMentoringReqUpdate(SimpSession session, MentoringRequestPayload mentoringReqPayload) {
+        sendToUserBySessionId(session.getId(), QUEUE_MENTORING_REQ_DESTINATION, mentoringReqPayload);
+    }
+
+    private void sendToUserBySessionId(String sessionId, String destination, Object payload) {
+        simpMessagingTemplate.convertAndSendToUser(sessionId, destination, payload, createHeaders(sessionId));
+    }
+
+    private MessageHeaders createHeaders(String sessionId) {
+        SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
+        headerAccessor.setSessionId(sessionId);
+        headerAccessor.setLeaveMutable(true);
+        return headerAccessor.getMessageHeaders();
+    }
+
+//    private final PlatformTransactionManager platformTransactionManager;
+
     @Override
-    @Transactional
-    public void acceptMentoringReq(Long reqId, String email) {
+    public MentoringRequestPayload acceptMentoringReq(Long reqId, String email) {
         log.debug("Accepting mentoring request by id = [{}]", reqId);
+//        MentoringRequestDTO mentoringRequestDTO;
+//        ChatDTO chat;
         MentoringRequestDTO mentoringRequestDTO = mentoringRequestService.acceptMentoringReqStatusById(reqId, email);
-        chatService.createChat(createChatForMentoringReq(mentoringRequestDTO));
+        ChatDTO chat = chatService.createChat(createChatForMentoringReq(mentoringRequestDTO));
+//        DefaultTransactionDefinition transactionDefinition = new DefaultTransactionDefinition();
+//        transactionDefinition.setName("AcceptingMentoringRequest");
+//        transactionDefinition.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+//        TransactionStatus status = platformTransactionManager.getTransaction(transactionDefinition);
+//        try {
+//            mentoringRequestDTO = mentoringRequestService.acceptMentoringReqStatusById(reqId, email);
+//            chat = chatService.createChat(createChatForMentoringReq(mentoringRequestDTO));
+//        } catch (RuntimeException e) {
+//            platformTransactionManager.rollback(status);
+//            throw new RuntimeException("Can't accept mentoring req", e);
+//        }
+//        platformTransactionManager.commit(status);
+        chatSystemFacade.addNewChatToPageIfSubscribed(chat.getId(), chat.getUsers().stream().map(UserDTO::getEmail).toList());
+        return createMentoringReqPayload(mentoringRequestDTO);
     }
 
     private ChatDTO createChatForMentoringReq(MentoringRequestDTO mentoringRequestDTO) {
         ChatDTO chat = new ChatDTO();
+        chat.addMentoringReqId(mentoringRequestDTO.getId());
+        chat.setStatus(ChatStatus.ACTIVE);
         chat.setUsers(getUsersFromMentoringRequest(mentoringRequestDTO));
         chat.setCreatedAt(getTimestampNow());
         return chat;
@@ -197,15 +246,26 @@ public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
     }
 
     @Override
-    public void rejectMentoringReq(Long reqId, String email) {
+    public MentoringRequestPayload rejectMentoringReq(Long reqId, String email) {
         log.debug("Rejecting mentoring request by id = [{}]", reqId);
-        mentoringRequestService.rejectMentoringReqStatusById(reqId, email);
+        MentoringRequestDTO mentoringRequestDTO = mentoringRequestService.rejectMentoringReqStatusById(reqId, email);
+        return createMentoringReqPayload(mentoringRequestDTO);
     }
 
     @Override
-    public void cancelMentoringReq(Long reqId, String email) {
+    public MentoringRequestPayload cancelMentoringReq(Long reqId, String email) {
         log.debug("Canceling mentoring request by id = [{}]", reqId);
-        mentoringRequestService.cancelMentoringReqStatusById(reqId, email);
+        MentoringRequestDTO mentoringRequestDTO = mentoringRequestService.cancelMentoringReqStatusById(reqId, email);
+        return createMentoringReqPayload(mentoringRequestDTO);
+    }
+
+    @Override
+    @Transactional
+    public MentoringRequestPayload finishMentoringReq(Long reqId, String email) {
+        log.debug("Finishing mentoring request by id = [{}]", reqId);
+        MentoringRequestDTO mentoringRequestDTO = mentoringRequestService.finishMentoringReqStatusById(reqId, email);
+        chatService.archiveChatByMentoringReqId(mentoringRequestDTO.getId());
+        return createMentoringReqPayload(mentoringRequestDTO);
     }
 
     @Override
@@ -234,12 +294,9 @@ public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
     }
 
     private ReviewDTO createReviewDto(CreateReviewRequest review, String fromEmail) {
-        UserDTO userTo = new UserDTO();
-        userTo.setId(review.getToUserId());
-        UserDTO userFrom = userService.getUserByEmail(fromEmail);
         ReviewDTO reviewDto = new ReviewDTO();
-        reviewDto.setToUser(userTo);
-        reviewDto.setFromUser(userFrom);
+        reviewDto.setToUser(UserDTO.builder().id(review.getToUserId()).build());
+        reviewDto.setFromUser(UserDTO.builder().id(userService.getUserIdByEmail(fromEmail)).build());
         reviewDto.setText(review.getText());
         reviewDto.setRating(review.getRating());
         reviewDto.setCreatedAt(getTimestampNow());
@@ -248,7 +305,9 @@ public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
 
     @Override
     @Transactional
-    public UserWithQuestionnaire updateQuestionnaireByUserEmail(String email, QuestionnaireUpdateRequest questionnaire, MultipartFile photo) {
+    public void updateQuestionnaireByUserEmail(String email,
+                                               QuestionnaireUpdateRequest questionnaire,
+                                               MultipartFile photo) {
         log.debug("Updating questionnaire by user email = [{}]", email);
         Long userId = userService.getUserByEmail(email).getId();
         if (!isNull(photo)) {
@@ -258,7 +317,6 @@ public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
             questionnaireService.updateQuestionnaire(createQuestionnaireDto(questionnaire, userId));
             userService.updateUserStatusById(userId, ACTIVE);
         }
-        return getUserWithPhotoById(userId);
     }
 
     private QuestionnaireDTO createQuestionnaireDto(QuestionnaireUpdateRequest questionnaire, Long userId) {
@@ -281,50 +339,38 @@ public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
     }
 
     @Override
-    public void deleteProfilePhotoByUserEmail(String email) {
-        UserDTO user = userService.getUserByEmail(email);
+    public void deleteProfilePhotoByUserEmail(String userEmail) {
+        UserDTO user = userService.getUserByEmail(userEmail);
         s3Service.removeUserPhoto(user.getId());
     }
 
     @Override
-    public ChatBO getChatById(Long chatId, String reqEmail) {
-        log.debug("Getting chat by id = [{}]", chatId);
-        if (!userHasAccessToChat(chatId, reqEmail)) {
-            throw new ResponseStatusException(FORBIDDEN, "Схоже Ви не маєте доступу до цього чату.");
+    public MentoringRequestPayload getLastMentoringRequestByUsers(Long firstUserId, String secondUserEmail) {
+        log.debug("Get last mentoring request by users");
+        MentoringRequestDTO mentoringRequestDTO = mentoringRequestService.getMentoringRequestByUsers(firstUserId, secondUserEmail);
+        return createMentoringReqPayload(mentoringRequestDTO);
+    }
+
+    private MentoringRequestPayload createMentoringReqPayload(MentoringRequestDTO mentoringRequestDTO) {
+        if (isNull(mentoringRequestDTO)) {
+            return null;
         }
-        PrivateChat privateChat = chatService.getChatById(chatId, reqEmail);
-        return createChatBo(privateChat);
-    }
-
-    private boolean userHasAccessToChat(Long chatId, String reqEmail) {
-        return chatService.userHasAccessToChat(chatId, reqEmail);
-    }
-
-    private ChatBO createChatBo(PrivateChat privateChat) {
-        ChatBO chatBo = new ChatBO();
-        chatBo.setId(privateChat.getId());
-        chatBo.setTitle(privateChat.getTitle());
-        chatBo.setPhotoUrl(getProfilePhotoUrlByUserId(privateChat.getToUserId()));
-        chatBo.setLastMessageDate(parseTimestampToISO8601String(privateChat.getLastMessageCreatedAt()));
-        chatBo.setLastMessageText(privateChat.getLastMessageText());
-        return chatBo;
+        UserDTO from = mentoringRequestDTO.getFrom();
+        return MentoringRequestPayload.builder()
+                .id(mentoringRequestDTO.getId())
+                .from(RequestUser.builder()
+                        .id(from.getId())
+                        .name(from.getName())
+                        .surname(from.getSurname())
+                        .profilePhotoUrl(getProfilePhotoUrlByUserId(from.getId()))
+                        .build())
+                .status(mentoringRequestDTO.getStatus())
+                .build();
     }
 
     @Override
-    public PageBO<ChatBO> getChatsByUserEmail(String email, int numberOfPage) {
-        log.debug("Getting chats by user email = [{}]", email);
-        PageBO<PrivateChat> chatPage = chatService.getChatsByUserEmail(email, numberOfPage);
-        PageBO<ChatBO> resChatPage = new PageBO<>(chatPage.getCurrentPageNumber(), chatPage.getTotalPages());
-        for (PrivateChat privateChat : chatPage.getContent()) {
-            resChatPage.addElement(createChatBo(privateChat));
-        }
-        return resChatPage;
-    }
-
-    @Override
-    public void getMessagesByChatId(Long chatId, int numberOfPage) {
-        log.debug("Getting messages by chat id = [{}]", chatId);
-        PageBO<MessageDTO> messagePage = messageService.getMessagesByChatId(chatId, numberOfPage);
-
+    public boolean checkIfUserCanWriteReview(String fromUserEmail, Long toUserId) {
+        log.debug("Checking if user can write review");
+        return reviewService.checkIfUserCanWriteReview(fromUserEmail, toUserId);
     }
 }

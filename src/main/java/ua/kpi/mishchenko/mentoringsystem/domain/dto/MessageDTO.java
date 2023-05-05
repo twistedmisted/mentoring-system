@@ -1,6 +1,7 @@
 package ua.kpi.mishchenko.mentoringsystem.domain.dto;
 
 import lombok.Data;
+import ua.kpi.mishchenko.mentoringsystem.domain.util.MessageStatus;
 
 import java.sql.Timestamp;
 
@@ -12,4 +13,5 @@ public class MessageDTO {
     private Long chatId;
     private UserDTO fromUser;
     private Timestamp createdAt;
+    private MessageStatus status;
 }

@@ -9,5 +9,7 @@ public interface ReviewService {
 
     void createReview(ReviewDTO reviewDto);
 
+    boolean checkIfUserCanWriteReview(String fromUserEmail, Long toUserId);
+
     double getAvgRatingByUserId(Long userId);
 }

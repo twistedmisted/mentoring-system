@@ -25,7 +25,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     public void updateQuestionnaire(QuestionnaireDTO questionnaireDto) {
         Long userId = questionnaireDto.getUserId();
         log.debug("Updating questionnaire by user id = [{}]", userId);
-        QuestionnaireEntity questionnaireEntity = new QuestionnaireEntity();
+        QuestionnaireEntity questionnaireEntity;
         if (existsById(userId)) {
             questionnaireEntity = questionnaireRepository.findById(userId).get();
             mapNewToOldEntity(questionnaireEntity, questionnaireDto);
