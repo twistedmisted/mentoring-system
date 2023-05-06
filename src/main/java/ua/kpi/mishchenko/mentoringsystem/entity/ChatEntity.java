@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 
 import static jakarta.persistence.CascadeType.ALL;
+import static jakarta.persistence.FetchType.EAGER;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -47,10 +48,10 @@ public class ChatEntity {
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<UserEntity> users = new HashSet<>();
 
-    @OneToMany(mappedBy = "chat", cascade = ALL)
+    @OneToMany(mappedBy = "chat", fetch = EAGER, cascade = ALL)
     private List<MessageEntity> messages = new ArrayList<>();
 
-    @OneToMany(mappedBy = "chat", cascade = ALL)
+    @OneToMany(mappedBy = "chat", fetch = EAGER, cascade = ALL)
     private List<MentoringRequestEntity> mentoringRequests = new ArrayList<>();
 
     public void addMentoringRequest(MentoringRequestEntity mentoringRequest) {

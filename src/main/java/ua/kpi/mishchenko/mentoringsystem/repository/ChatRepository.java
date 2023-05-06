@@ -59,6 +59,11 @@ public interface ChatRepository extends CrudRepository<ChatEntity, Long> {
             "GROUP BY c.id, u.surname, u.name, m.createdAt, c.createdAt, m.text, u.id ")
     Page<PrivateChat> findAllProjections(String userEmail, Pageable pageable);
 
+    @Query("SElECT c FROM ChatEntity c " +
+            "JOIN c.users u " +
+            "WHERE u.id IN (:ids) " +
+            "GROUP BY c " +
+            "HAVING COUNT(c) = 2 ")
     Optional<ChatEntity> findByUsersIdIn(List<Long> ids);
 
     boolean existsByIdAndUsersEmail(Long id, String email);

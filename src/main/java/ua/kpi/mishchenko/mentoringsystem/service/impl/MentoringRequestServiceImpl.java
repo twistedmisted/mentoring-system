@@ -232,7 +232,7 @@ public class MentoringRequestServiceImpl implements MentoringRequestService {
             }
             logAndThrowForbiddenException(NO_RIGHTS_TO_ACCEPT);
         }
-        logAndThrowProcessedReqException();
+        logAndThrowProcessedReqException("Не вдається прийняти запит, схоже він був уже опрацьований.");
         return null;
     }
 
@@ -254,7 +254,7 @@ public class MentoringRequestServiceImpl implements MentoringRequestService {
             }
             logAndThrowForbiddenException(NO_RIGHTS_TO_REJECT);
         }
-        logAndThrowProcessedReqException();
+        logAndThrowProcessedReqException("Не вдається відхилити запит, схоже він був уже опрацьований.");
         return null;
     }
 
@@ -270,7 +270,7 @@ public class MentoringRequestServiceImpl implements MentoringRequestService {
             }
             logAndThrowForbiddenException(NO_RIGHTS_TO_CANCEL);
         }
-        logAndThrowProcessedReqException();
+        logAndThrowProcessedReqException("Не вдається відмінити запит, схоже він був уже опрацьований.");
         return null;
     }
 
@@ -287,7 +287,7 @@ public class MentoringRequestServiceImpl implements MentoringRequestService {
             }
             logAndThrowForbiddenException(NO_RIGHTS_TO_FINISH);
         }
-        logAndThrowProcessedReqException();
+        logAndThrowProcessedReqException("Не вдається закінчити співпрацю.");
         return null;
     }
 
@@ -331,9 +331,9 @@ public class MentoringRequestServiceImpl implements MentoringRequestService {
         throw new ResponseStatusException(FORBIDDEN, exMessage);
     }
 
-    private void logAndThrowProcessedReqException() {
+    private void logAndThrowProcessedReqException(String message) {
         log.debug("The mentoring request can't change status from Accepted or Rejected");
-        throw new ResponseStatusException(BAD_REQUEST, "Запит уже був опрацьований.");
+        throw new ResponseStatusException(BAD_REQUEST, message);
     }
 
     @Override

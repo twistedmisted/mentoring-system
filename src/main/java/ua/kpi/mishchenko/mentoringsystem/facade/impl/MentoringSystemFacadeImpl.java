@@ -204,28 +204,15 @@ public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
         return headerAccessor.getMessageHeaders();
     }
 
-//    private final PlatformTransactionManager platformTransactionManager;
-
     @Override
+    @Transactional
     public MentoringRequestPayload acceptMentoringReq(Long reqId, String email) {
         log.debug("Accepting mentoring request by id = [{}]", reqId);
-//        MentoringRequestDTO mentoringRequestDTO;
-//        ChatDTO chat;
         MentoringRequestDTO mentoringRequestDTO = mentoringRequestService.acceptMentoringReqStatusById(reqId, email);
         ChatDTO chat = chatService.createChat(createChatForMentoringReq(mentoringRequestDTO));
-//        DefaultTransactionDefinition transactionDefinition = new DefaultTransactionDefinition();
-//        transactionDefinition.setName("AcceptingMentoringRequest");
-//        transactionDefinition.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
-//        TransactionStatus status = platformTransactionManager.getTransaction(transactionDefinition);
-//        try {
-//            mentoringRequestDTO = mentoringRequestService.acceptMentoringReqStatusById(reqId, email);
-//            chat = chatService.createChat(createChatForMentoringReq(mentoringRequestDTO));
-//        } catch (RuntimeException e) {
-//            platformTransactionManager.rollback(status);
-//            throw new RuntimeException("Can't accept mentoring req", e);
-//        }
-//        platformTransactionManager.commit(status);
-        chatSystemFacade.addNewChatToPageIfSubscribed(chat.getId(), chat.getUsers().stream().map(UserDTO::getEmail).toList());
+        if (!isNull(chat)) {
+            chatSystemFacade.addNewChatToPageIfSubscribed(chat.getId(), chat.getUsers().stream().map(UserDTO::getEmail).toList());
+        }
         return createMentoringReqPayload(mentoringRequestDTO);
     }
 

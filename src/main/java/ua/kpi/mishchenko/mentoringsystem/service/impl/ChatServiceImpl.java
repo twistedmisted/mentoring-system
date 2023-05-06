@@ -72,13 +72,9 @@ public class ChatServiceImpl implements ChatService {
             chatEntity.addMentoringRequest(mentoringRequestRepository.findById(chat.getMentoringReqIds().get(0)).get());
         } else {
             log.debug("Chat is already active");
-            return chat;
+            return null;
         }
         return chatMapper.entityToDto(chatRepository.save(chatEntity));
-    }
-
-    private boolean existsById(Long id) {
-        return chatRepository.existsById(id);
     }
 
     @Override
