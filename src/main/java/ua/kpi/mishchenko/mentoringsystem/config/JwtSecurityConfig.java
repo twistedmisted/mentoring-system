@@ -95,6 +95,7 @@ public class JwtSecurityConfig {
                         API_PATH + "/specializations",
                         API_PATH + "/reviews",
                         API_PATH + "/auth/validate-token",
+                        "/ws-socket/**",
                         "/api/v1/test").permitAll()
 //                .requestMatchers("/chat").permitAll()
 //                .requestMatchers(POST, API_PATH + "/recipes").hasRole(USER)
