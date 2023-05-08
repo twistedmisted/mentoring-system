@@ -27,7 +27,7 @@ public class SubscribeChannelInterceptorAdapter implements ChannelInterceptor {
 
     private static final Pattern CHAT_ID_PATTERN = Pattern.compile("/\\d+/");
     private static final Pattern CHAT_SUBSCRIBER_PATTERN = Pattern.compile("/user/queue/chat/[0-9]+/message");
-    private static final Pattern MESSSAGE_SEND_PATTERN = Pattern.compile("/user/app/message/[0-9]+");
+    private static final Pattern MESSSAGE_SEND_PATTERN = Pattern.compile("/app/message/[0-9]+");
 
     private final ChatService chatService;
 
@@ -62,6 +62,9 @@ public class SubscribeChannelInterceptorAdapter implements ChannelInterceptor {
                 String userEmail = principal.getName();
                 if (userHasNotAccessToChat(chatId, userEmail)) {
                     throw new AccessDeniedException("You don't have access to send messages to this chat.");
+                }
+                if (chatIsArchived(chatId)) {
+                    throw new AccessDeniedException("Chat is archived");
                 }
             }
         }
