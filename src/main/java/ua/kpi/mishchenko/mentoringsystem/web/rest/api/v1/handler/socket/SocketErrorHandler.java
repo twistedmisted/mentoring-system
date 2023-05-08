@@ -28,7 +28,7 @@ public class SocketErrorHandler extends StompSubProtocolErrorHandler {
 
     private static Message<byte[]> handleAccessDeniedException(Message<byte[]> clientMessage) {
         StompHeaderAccessor accessor = StompHeaderAccessor.create(StompCommand.ERROR);
-        accessor.setMessage("403");
+        accessor.setMessage("400");
         accessor.setLeaveMutable(true);
         accessor.setReceiptId(String.valueOf(clientMessage.getHeaders().get("simpSessionId")));
         return MessageBuilder.createMessage("You don't have access to this".getBytes(), accessor.getMessageHeaders());
