@@ -51,10 +51,12 @@ public class UserController {
         if (checkPermissionForNotActiveUser(principal, user.getEmail(), user.getStatus())) {
             throw new ResponseStatusException(NOT_FOUND, "Не вдається знайти даного користувача.");
         }
-        String reqEmail = principal.getName();
-        if (!user.getEmail().equals(reqEmail)) {
-            user.setMentoringRequest(mentoringSystemFacade.getLastMentoringRequestByUsers(userId, reqEmail));
-            user.setReviewAvailable(mentoringSystemFacade.checkIfUserCanWriteReview(reqEmail, user.getId()));
+        if (!isNull(principal)) {
+            String reqEmail = principal.getName();
+            if (!user.getEmail().equals(reqEmail)) {
+                user.setMentoringRequest(mentoringSystemFacade.getLastMentoringRequestByUsers(userId, reqEmail));
+                user.setReviewAvailable(mentoringSystemFacade.checkIfUserCanWriteReview(reqEmail, user.getId()));
+            }
         }
         responseBody.put("user", user);
         return new ResponseEntity<>(responseBody, OK);
