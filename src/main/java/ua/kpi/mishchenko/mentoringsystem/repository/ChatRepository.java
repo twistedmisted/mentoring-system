@@ -28,6 +28,12 @@ public interface ChatRepository extends CrudRepository<ChatEntity, Long> {
             "LIMIT 1")
     Optional<PrivateChat> findProjections(Long id, String reqEmail);
 
+    @Query("SELECT c FROM ChatEntity c " +
+            "JOIN c.users u " +
+            "JOIN c.mentoringRequests m " +
+            "WHERE m.id = :mentoringReqId")
+    Optional<ChatEntity> findByMentoringRequestsIdWithMembers(Long mentoringReqId);
+
     @Query("SELECT c.id AS id, " +
             "       CONCAT(u.surname, ' ', u.name) AS title, " +
             "       COALESCE(m.createdAt, c.createdAt) AS lastMessageCreatedAt, " +
@@ -75,4 +81,9 @@ public interface ChatRepository extends CrudRepository<ChatEntity, Long> {
             "SET c.status = ua.kpi.mishchenko.mentoringsystem.domain.util.ChatStatus.ARCHIVED " +
             "WHERE c.id = (SELECT m.chat.id FROM MentoringRequestEntity m WHERE m.id = :reqId) ")
     void updateChatStatusByMentoringReqId(Long reqId);
+
+    @Query("SELECT c FROM ChatEntity c " +
+            "JOIN c.users u " +
+            "WHERE c.id = :chatId ")
+    Optional<ChatEntity> findByIdWithMembers(Long chatId);
 }

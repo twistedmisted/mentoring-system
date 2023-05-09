@@ -111,10 +111,10 @@ public class MentoringRequestServiceImpl implements MentoringRequestService {
             log.debug("The request for user with email = [{}] and user with id = [{}] with status ACCEPTED already exists", fromEmail, toUserId);
             throw new ResponseStatusException(BAD_REQUEST, "Необхідно завершити минулу співпрацю, щоб розпочати нову.");
         }
-        if (usersAlreadyHasRequestWithStatus(fromEmail, toUserId, REJECTED)
+        if (userAlreadySendRequestAndReceiveReject(fromEmail, toUserId)
                 && notEnoughTimePassedFromLastRequestWithStatus(fromEmail, toUserId, REJECTED)) {
             log.debug("The request for user with email = [{}] and user with id = [{}] with status REJECTED already exists", fromEmail, toUserId);
-            throw new ResponseStatusException(BAD_REQUEST, "Необхідно завершити минулу співпрацю, щоб розпочати нову.");
+            throw new ResponseStatusException(BAD_REQUEST, "Необіхдно зачекати 3 дні, щоб повторно відправити запит цій людині.");
         }
         UserEntity userFrom = userRepository.findByEmail(fromEmail).orElse(null);
         if (isNull(userFrom)) {
@@ -166,14 +166,16 @@ public class MentoringRequestServiceImpl implements MentoringRequestService {
 
     private boolean notEnoughTimePassedFromLastRequestWithStatus(String fromEmail, Long toUserId, MentoringRequestStatus status) {
         Timestamp now = getTimestampNow();
-        Timestamp lastUpdateDate = mentoringRequestRepository.findLastRequestTimeForUsersByStatus(toUserId, fromEmail, status);
-        return now.after(getTimeAfterCoolDown(lastUpdateDate));
+        Timestamp lastUpdateDate = mentoringRequestRepository.findLastRequestTimeFromUserEmailToUserId(toUserId, fromEmail, status);
+        return now.before(getTimeAfterCoolDown(lastUpdateDate, COOL_DOWN_FOR_REJECT));
     }
 
-    private Timestamp getTimeAfterCoolDown(Timestamp lastUpdateDate) {
+    private static final int COOL_DOWN_FOR_REJECT = 3;
+
+    private Timestamp getTimeAfterCoolDown(Timestamp lastUpdateDate, int numberOfDays) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(lastUpdateDate);
-        cal.add(DAY_OF_WEEK, 3);
+        cal.add(DAY_OF_WEEK, numberOfDays);
         return new Timestamp(cal.getTimeInMillis());
     }
 
@@ -191,6 +193,10 @@ public class MentoringRequestServiceImpl implements MentoringRequestService {
 
     private boolean usersAlreadyHasRequestWithStatus(String fromEmail, Long toUserId, MentoringRequestStatus status) {
         return mentoringRequestRepository.existsByTwoUsersAndStatus(toUserId, fromEmail, status);
+    }
+
+    private boolean userAlreadySendRequestAndReceiveReject(String fromEmail, Long toUserId) {
+        return mentoringRequestRepository.existsFromUserEmailToUserIdRejected(toUserId, fromEmail);
     }
 
     private MentoringRequestEntity createMentoringRequestEntity(UserEntity userFrom, UserEntity userTo) {
@@ -226,8 +232,8 @@ public class MentoringRequestServiceImpl implements MentoringRequestService {
                 }
                 MentoringRequestDTO updatedMentoringReq = mentoringRequestMapper.entityToDto(
                         updateMentoringRequestStatus(mentoringReqEntity, newStatus));
-                cancelAllPendingReqsForUserIfHaxMaxNumberAcceptedReq(email, countByReceiver);
-                cancelAllPendingReqsForUserIfHaxMaxNumberAcceptedReq(fromEmail, countByReceiver);
+                cancelAllPendingReqsForUserIfHaxMaxNumberAcceptedReq(email, ++countByReceiver);
+                cancelAllPendingReqsForUserIfHaxMaxNumberAcceptedReq(fromEmail, ++countBySender);
                 return updatedMentoringReq;
             }
             logAndThrowForbiddenException(NO_RIGHTS_TO_ACCEPT);

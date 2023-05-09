@@ -8,6 +8,8 @@ public interface ChatService {
 
     PrivateChat getChatById(Long chatId, String reqEmail);
 
+    ChatDTO getChatByMentoringReqId(Long mentoringReqId);
+
     PageBO<PrivateChat> getChatsByUserEmail(String email, int numberOfPage);
 
     ChatDTO createChat(ChatDTO chat);

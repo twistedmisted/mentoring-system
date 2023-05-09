@@ -52,6 +52,7 @@ import java.util.Set;
 import static java.util.Objects.isNull;
 import static ua.kpi.mishchenko.mentoringsystem.domain.util.UserStatus.ACTIVE;
 import static ua.kpi.mishchenko.mentoringsystem.service.impl.S3ServiceImpl.PROFILE_PHOTO;
+import static ua.kpi.mishchenko.mentoringsystem.util.Util.formatRating;
 import static ua.kpi.mishchenko.mentoringsystem.util.Util.getTimestampNow;
 import static ua.kpi.mishchenko.mentoringsystem.util.Util.parseTimestampToStringDate;
 
@@ -98,7 +99,7 @@ public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
                 .role(userDTO.getRole())
                 .status(userDTO.getStatus())
                 .createdAt(parseTimestampToStringDate(userDTO.getCreatedAt()))
-                .rating(reviewService.getAvgRatingByUserId(userDTO.getId()))
+                .rating(formatRating(reviewService.getAvgRatingByUserId(userDTO.getId())))
                 .questionnaire(createQuestionnaireBO(userDTO.getQuestionnaire(), profilePhotoUrl))
                 .build();
     }
@@ -211,7 +212,7 @@ public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
         MentoringRequestDTO mentoringRequestDTO = mentoringRequestService.acceptMentoringReqStatusById(reqId, email);
         ChatDTO chat = chatService.createChat(createChatForMentoringReq(mentoringRequestDTO));
         if (!isNull(chat)) {
-            chatSystemFacade.addNewChatToPageIfSubscribed(chat.getId(), chat.getUsers().stream().map(UserDTO::getEmail).toList());
+            chatSystemFacade.updateChatInList(chat.getId(), chat.getUsers().stream().map(UserDTO::getEmail).toList());
         }
         return createMentoringReqPayload(mentoringRequestDTO);
     }
@@ -252,6 +253,10 @@ public class MentoringSystemFacadeImpl implements MentoringSystemFacade {
         log.debug("Finishing mentoring request by id = [{}]", reqId);
         MentoringRequestDTO mentoringRequestDTO = mentoringRequestService.finishMentoringReqStatusById(reqId, email);
         chatService.archiveChatByMentoringReqId(mentoringRequestDTO.getId());
+        ChatDTO chat = chatService.getChatByMentoringReqId(mentoringRequestDTO.getId());
+        if (!isNull(chat)) {
+            chatSystemFacade.updateChatInList(chat.getId(), chat.getUsers().stream().map(UserDTO::getEmail).toList());
+        }
         return createMentoringReqPayload(mentoringRequestDTO);
     }
 

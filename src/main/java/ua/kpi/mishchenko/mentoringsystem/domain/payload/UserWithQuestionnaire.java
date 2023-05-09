@@ -19,7 +19,7 @@ public class UserWithQuestionnaire {
     private UserStatus status;
     private String createdAt;
     private String role;
-    private double rating;
+    private String rating;
     private QuestionnaireBO questionnaire;
 
     @JsonInclude(NON_NULL)

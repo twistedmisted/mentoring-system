@@ -36,16 +36,22 @@ public interface MentoringRequestRepository extends CrudRepository<MentoringRequ
     boolean existsByTwoUsersAndStatus(Long firstUserId, String secondUserEmail, MentoringRequestStatus status);
 
     @Query("SELECT COUNT(m) > 0 FROM MentoringRequestEntity m " +
+            "WHERE m.to.id = :toUserId AND m.from.email = :fromEmail " +
+            "AND m.status = ua.kpi.mishchenko.mentoringsystem.domain.util.MentoringRequestStatus.REJECTED ")
+    boolean existsFromUserEmailToUserIdRejected(Long toUserId, String fromEmail);
+
+    @Query("SELECT COUNT(m) > 0 FROM MentoringRequestEntity m " +
             "WHERE ((m.to.id = :firstUserId AND m.from.id = :secondUserId) " +
             "OR (m.from.id = :firstUserId AND m.to.id = :secondUserId)) " +
             "AND m.status = :status ")
     boolean existsByTwoUsersAndStatus(Long firstUserId, Long secondUserId, MentoringRequestStatus status);
 
     @Query("SELECT m.updatedAt FROM MentoringRequestEntity m " +
-            "WHERE ((m.to.id = :firstUserId AND m.from.email = :secondUserEmail) " +
-            "OR (m.from.id = :firstUserId AND m.to.email = :secondUserEmail)) " +
-            "AND m.status = :status ")
-    Timestamp findLastRequestTimeForUsersByStatus(Long firstUserId, String secondUserEmail, MentoringRequestStatus status);
+            "WHERE m.to.id = :toUserId AND m.from.email = :fromUserEmail " +
+            "AND m.status = :status " +
+            "ORDER BY m.updatedAt DESC " +
+            "LIMIT 1 ")
+    Timestamp findLastRequestTimeFromUserEmailToUserId(Long toUserId, String fromUserEmail, MentoringRequestStatus status);
 
     @Query("SELECT count(m) FROM MentoringRequestEntity m " +
             "WHERE (m.from.email = :email " +
@@ -77,7 +83,7 @@ public interface MentoringRequestRepository extends CrudRepository<MentoringRequ
     @Query("UPDATE MentoringRequestEntity m " +
             "SET m.status = ua.kpi.mishchenko.mentoringsystem.domain.util.MentoringRequestStatus.FINISHED " +
             "WHERE m.status = ua.kpi.mishchenko.mentoringsystem.domain.util.MentoringRequestStatus.PENDING " +
-            "AND m.from.email = :email OR m.to.email = :email ")
+            "AND (m.from.id = (SELECT u.id FROM UserEntity u WHERE u.email = :email) OR m.to.id = (SELECT u.id FROM UserEntity u WHERE u.email = :email)) ")
     void cancelAllPendingRequestsByUserEmail(String email);
 
     List<MentoringRequestEntity> findAllByIdIn(List<Long> ids);

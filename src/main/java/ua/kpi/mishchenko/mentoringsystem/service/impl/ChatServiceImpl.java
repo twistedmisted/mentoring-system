@@ -42,6 +42,12 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
+    public ChatDTO getChatByMentoringReqId(Long mentoringReqId) {
+        return chatMapper.entityToDto(chatRepository.findByMentoringRequestsIdWithMembers(mentoringReqId)
+                .orElse(null));
+    }
+
+    @Override
     public PageBO<PrivateChat> getChatsByUserEmail(String email, int numberOfPage) {
         log.debug("Getting chats by user email = [{}]", email);
         if (lessThanOne(numberOfPage)) {

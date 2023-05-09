@@ -25,7 +25,7 @@ import static org.springframework.messaging.simp.stomp.StompCommand.SUBSCRIBE;
 @Slf4j
 public class SubscribeChannelInterceptorAdapter implements ChannelInterceptor {
 
-    private static final Pattern CHAT_ID_PATTERN = Pattern.compile("/\\d+/");
+    private static final Pattern CHAT_ID_PATTERN = Pattern.compile("/\\d+");
     private static final Pattern CHAT_SUBSCRIBER_PATTERN = Pattern.compile("/user/queue/chat/[0-9]+/message");
     private static final Pattern MESSSAGE_SEND_PATTERN = Pattern.compile("/app/message/[0-9]+");
 

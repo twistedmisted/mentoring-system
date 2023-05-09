@@ -2,6 +2,7 @@ package ua.kpi.mishchenko.mentoringsystem.util;
 
 import java.sql.Timestamp;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -41,5 +42,11 @@ public class Util {
         } catch (ParseException e) {
             throw new RuntimeException("Cannot parse isoDate to Timestamp");
         }
+    }
+
+    private static final DecimalFormat RATING_FORMAT = new DecimalFormat("#.#");
+
+    public static String formatRating(double rating) {
+        return RATING_FORMAT.format(rating);
     }
 }

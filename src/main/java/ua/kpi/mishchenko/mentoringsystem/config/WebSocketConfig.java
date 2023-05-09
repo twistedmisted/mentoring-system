@@ -37,10 +37,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.setErrorHandler(socketErrorHandler)
                 .addEndpoint("/ws-socket")
-                .setAllowedOriginPatterns("http://localhost:3000");
+                .setAllowedOriginPatterns("*");
         registry.setErrorHandler(socketErrorHandler)
                 .addEndpoint("/ws-socket")
-                .setAllowedOriginPatterns("http://localhost:3000")
+                .setAllowedOriginPatterns("*")
                 .withSockJS();
     }
 

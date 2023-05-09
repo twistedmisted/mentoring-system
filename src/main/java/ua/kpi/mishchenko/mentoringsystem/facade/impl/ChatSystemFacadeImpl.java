@@ -180,7 +180,7 @@ public class ChatSystemFacadeImpl implements ChatSystemFacade {
     }
 
     @Override
-    public void addNewChatToPageIfSubscribed(Long chatId, List<String> userEmails) {
+    public void updateChatInList(Long chatId, List<String> userEmails) {
         sendChatUpdate(chatId, userEmails);
     }
 

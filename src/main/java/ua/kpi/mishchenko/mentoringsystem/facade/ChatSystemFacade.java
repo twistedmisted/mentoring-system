@@ -16,7 +16,7 @@ public interface ChatSystemFacade {
 
     void processMessageSend(Long chatId, MessageRequest messageRequest, String senderEmail, SimpMessageHeaderAccessor headerAccessor);
 
-    void addNewChatToPageIfSubscribed(Long chatId, List<String> userEmails);
+    void updateChatInList(Long chatId, List<String> userEmails);
 
     PageBO<PrivateMessageResponse> getMessagesByChatId(Long chatId, int numberOfPage, String principal);
 }

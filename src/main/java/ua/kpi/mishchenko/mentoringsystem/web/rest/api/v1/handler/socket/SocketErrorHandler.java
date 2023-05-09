@@ -1,5 +1,6 @@
 package ua.kpi.mishchenko.mentoringsystem.web.rest.api.v1.handler.socket;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageDeliveryException;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -9,17 +10,19 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.StompSubProtocolErrorHandler;
 
+import static java.util.Objects.isNull;
+
 @Component
+@RequiredArgsConstructor
 public class SocketErrorHandler extends StompSubProtocolErrorHandler {
 
     @Override
     public Message<byte[]> handleClientMessageProcessingError(Message<byte[]> clientMessage, Throwable ex) {
-        Throwable exception = ex;
-        if (exception instanceof MessageDeliveryException) {
-            exception = exception.getCause();
+        if (ex instanceof MessageDeliveryException) {
+            ex = ex.getCause();
         }
 
-        if (exception instanceof AccessDeniedException) {
+        if (ex instanceof AccessDeniedException) {
             return handleAccessDeniedException(clientMessage);
         }
 
@@ -31,6 +34,10 @@ public class SocketErrorHandler extends StompSubProtocolErrorHandler {
         accessor.setMessage("400");
         accessor.setLeaveMutable(true);
         accessor.setReceiptId(String.valueOf(clientMessage.getHeaders().get("simpSessionId")));
-        return MessageBuilder.createMessage("You don't have access to this".getBytes(), accessor.getMessageHeaders());
+        String simpDestination = clientMessage.getHeaders().get("simpDestination", String.class);
+        if (isNull(simpDestination)) {
+            return MessageBuilder.createMessage("You don't have access to this".getBytes(), accessor.getMessageHeaders());
+        }
+        return MessageBuilder.createMessage(simpDestination.getBytes(), accessor.getMessageHeaders());
     }
 }
