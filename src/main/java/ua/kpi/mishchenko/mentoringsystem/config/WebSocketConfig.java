@@ -12,9 +12,9 @@ import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
-import ua.kpi.mishchenko.mentoringsystem.web.rest.api.v1.handler.socket.SocketErrorHandler;
-import ua.kpi.mishchenko.mentoringsystem.web.rest.api.v1.interceptor.socket.AuthChannelInterceptorAdapter;
-import ua.kpi.mishchenko.mentoringsystem.web.rest.api.v1.interceptor.socket.SubscribeChannelInterceptorAdapter;
+import ua.kpi.mishchenko.mentoringsystem.web.socket.handler.SocketErrorHandler;
+import ua.kpi.mishchenko.mentoringsystem.web.socket.interceptor.AuthChannelInterceptorAdapter;
+import ua.kpi.mishchenko.mentoringsystem.web.socket.interceptor.SubscribeChannelInterceptorAdapter;
 
 @Configuration
 @EnableWebSocketMessageBroker

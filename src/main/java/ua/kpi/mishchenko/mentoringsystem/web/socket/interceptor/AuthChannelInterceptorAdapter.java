@@ -1,4 +1,4 @@
-package ua.kpi.mishchenko.mentoringsystem.web.rest.api.v1.interceptor.socket;
+package ua.kpi.mishchenko.mentoringsystem.web.socket.interceptor;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,4 +1,4 @@
-package ua.kpi.mishchenko.mentoringsystem.web.rest.api.v1.handler.socket;
+package ua.kpi.mishchenko.mentoringsystem.web.socket.handler;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.Message;
