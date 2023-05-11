@@ -37,10 +37,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.setErrorHandler(socketErrorHandler)
                 .addEndpoint("/ws-socket")
-                .setAllowedOriginPatterns("*");
+                .setAllowedOriginPatterns("https://mentoring-system-xada.onrender.com/");
+//                .setAllowedOriginPatterns("*");
         registry.setErrorHandler(socketErrorHandler)
                 .addEndpoint("/ws-socket")
-                .setAllowedOriginPatterns("*")
+                .setAllowedOriginPatterns("https://mentoring-system-xada.onrender.com/")
+//                .setAllowedOriginPatterns("*")
                 .withSockJS();
     }
 
