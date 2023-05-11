@@ -1,0 +1,1 @@
+[![Database Diagram](database/db-diagram.png)](https://github.com/twistedmisted/mentoring-system/blob/master/database/db-diagram.png)
