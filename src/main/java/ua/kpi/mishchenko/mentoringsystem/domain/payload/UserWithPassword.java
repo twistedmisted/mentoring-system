@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import ua.kpi.mishchenko.mentoringsystem.domain.dto.QuestionnaireDTO;
 import ua.kpi.mishchenko.mentoringsystem.domain.util.UserStatus;
@@ -16,12 +16,12 @@ public class UserWithPassword {
 
     private Long id;
 
-    @NotBlank(message = "Ім'я користувача не може бути порожнім.")
-    @Size(min = 2, max = 50, message = "Ім'я користувача повинно бути від 2 до 50 символів.")
+    @NotBlank(message = "Необхідно ввести ім'я.")
+    @Pattern(regexp = "^[А-ЯІіЇїЄєҐґ'\\-]{2,}$", message = "Ім'я має бути українською мовою та від 2 до 50 символів.")
     private String name;
 
-    @NotBlank(message = "Прізвище користувача не може бути порожнім.")
-    @Size(min = 2, max = 50, message = "Прізвище користувача повинно бути від 2 до 50 символів.")
+    @NotBlank(message = "Необхідно ввести прізвище.")
+    @Pattern(regexp = "^[А-ЯІіЇїЄєҐґ'\\-]{2,}$", message = "Прізвище має бути українською мовою та від 2 до 50 символів.")
     private String surname;
 
     @NotBlank(message = "Електронна пошта не може бути порожньою.")
