@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class RegistrationRequest {
 
-    @NotBlank(message = "Необхідно ввести ім'я користувача.")
+    @NotBlank(message = "Необхідно ввести ім'я.")
     @Size(min = 2, max = 50, message = "Ім'я користувача має бути від 2 до 50 символів.")
     private String name;
 
