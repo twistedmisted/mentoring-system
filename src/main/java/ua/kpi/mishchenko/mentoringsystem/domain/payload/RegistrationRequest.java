@@ -10,11 +10,11 @@ import lombok.Data;
 public class RegistrationRequest {
 
     @NotBlank(message = "Необхідно ввести ім'я.")
-    @Pattern(regexp = "^[А-Яа-яІіЇїЄєҐґ'\\-]{2,}$", message = "Ім'я має бути українською мовою та від 2 до 50 символів.")
+    @Pattern(regexp = "^[А-Яа-яІіЇїЄєҐґ'\\-]{2,50}$", message = "Ім'я має бути українською мовою та від 2 до 50 символів.")
     private String name;
 
     @NotBlank(message = "Необхідно ввести прізвище.")
-    @Pattern(regexp = "^[А-Яа-яІіЇїЄєҐґ'\\-]{2,}$", message = "Прізвище має бути українською мовою та від 2 до 50 символів.")
+    @Pattern(regexp = "^[А-Яа-яІіЇїЄєҐґ'\\-]{2,50}$", message = "Прізвище має бути українською мовою та від 2 до 50 символів.")
     private String surname;
 
     @NotBlank(message = "Необіхдно ввести електронну пошту.")

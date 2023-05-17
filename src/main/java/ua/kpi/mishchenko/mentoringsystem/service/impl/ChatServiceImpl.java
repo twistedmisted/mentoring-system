@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ua.kpi.mishchenko.mentoringsystem.domain.bo.PageBO;
@@ -18,6 +19,7 @@ import ua.kpi.mishchenko.mentoringsystem.repository.projection.PrivateChat;
 import ua.kpi.mishchenko.mentoringsystem.service.ChatService;
 
 import static java.util.Objects.isNull;
+import static org.springframework.data.domain.Sort.Direction.DESC;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static ua.kpi.mishchenko.mentoringsystem.domain.util.ChatStatus.ARCHIVED;
@@ -55,7 +57,7 @@ public class ChatServiceImpl implements ChatService {
             throw new ResponseStatusException(BAD_REQUEST, "Номер сторінки не може бути менше 1.");
         }
         Page<PrivateChat> chatPage = chatRepository.findAllProjections(email,
-                PageRequest.of(numberOfPage - 1, PAGE_SIZE));
+                PageRequest.of(numberOfPage - 1, PAGE_SIZE, Sort.by(DESC, "lastMessageCreatedAt")));
         if (!chatPage.hasContent()) {
             log.debug("Cannot find chats for user with email = [{}]", email);
             return new PageBO<>(numberOfPage, chatPage.getTotalPages());
